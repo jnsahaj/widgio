@@ -38,6 +38,7 @@ async function buildCli() {
   });
 
   await cp(join(root, "design-system"), join(dist, "design-system"), { recursive: true });
+  await cp(join(root, "plugin/skills/widgio"), join(dist, "skill"), { recursive: true });
 
   const cliPath = join(dist, "cli.js");
   const cli = await readFile(cliPath, "utf8");

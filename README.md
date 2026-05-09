@@ -11,17 +11,35 @@ animations carry the "drawing in" feel.
 
 MVP. SVG and HTML modes work. `sendPrompt` round-trip is stubbed for v2.
 
-## Install
+## Quick start
+
+One command — installs the CLI and walks you through wiring it up to your
+agent (Claude Code and/or Codex):
 
 ```bash
-pnpm install
-pnpm build
-# Symlink the CLI:
-ln -s "$(pwd)/dist/cli.js" /usr/local/bin/widgio
-chmod +x dist/cli.js
+npx widgio setup
 ```
 
-## Usage
+That command:
+
+1. Detects which agents are on your `$PATH`.
+2. Asks which to install for.
+3. For Codex, copies the skill to `~/.agents/skills/widgio/`.
+4. For Claude Code, prints the two `/plugin` commands to paste inside Claude.
+
+Or non-interactive flags:
+
+```bash
+npx widgio setup --all              # both agents
+npx widgio setup --codex            # Codex only
+npx widgio setup --claude           # Claude commands only
+npx widgio setup --codex --repo     # Codex skill in ./.agents (this repo only)
+```
+
+The `widgio` CLI itself is the npx entrypoint, so you also get every other
+command (`widgio show`, `widgio open`, etc.) without a global install.
+
+## Use it
 
 ```bash
 widgio show --title hello --loading "rendering" <<'EOF'
@@ -41,38 +59,26 @@ The first `widgio show` auto-spawns a detached daemon. It idle-shuts after
 
 ## Agent integration
 
-The `widgio` CLI must be on `$PATH` first (see Install above). Agents call it
-via shell. The repo ships skill metadata for two agents today:
-
 ### Claude Code
 
-This repo is a Claude Code plugin marketplace. Install the plugin with:
+This repo is a Claude Code plugin marketplace. Inside Claude Code:
 
 ```text
-# inside Claude Code:
 /plugin marketplace add jnsahaj/widgio
 /plugin install widgio@widgio
 ```
 
-This loads `plugin/skills/widgio/SKILL.md` — Claude reads it when it
-detects a request that benefits from a visual.
+(`widgio setup` prints these for you.)
 
 To install from a local checkout instead:
 
-```bash
+```text
 /plugin install /absolute/path/to/widgio/plugin
 ```
 
 ### Codex CLI
 
-Codex reads skills from `~/.agents/skills/<name>/SKILL.md`. The same
-`SKILL.md` file works as-is — copy it once:
-
-```bash
-./scripts/install-codex.sh           # installs to ~/.agents/skills/widgio
-./scripts/install-codex.sh --repo    # installs to ./.agents/skills/widgio (current project only)
-```
-
+`widgio setup --codex` copies `SKILL.md` to `~/.agents/skills/widgio/`.
 Verify Codex picked it up:
 
 ```bash
@@ -82,9 +88,8 @@ codex skills list | grep widgio
 ### Other agents
 
 The CLI is the universal interface — any agent that can run shell commands
-can use widgio. Point it at `plugin/skills/widgio/SKILL.md` (the file is
-plain markdown, no Claude- or OpenAI-specific syntax) and ensure `widgio`
-is on `$PATH`.
+can use widgio. Point it at `plugin/skills/widgio/SKILL.md` (plain markdown,
+no Claude- or OpenAI-specific syntax) and ensure `widgio` is on `$PATH`.
 
 ## Architecture
 
@@ -97,12 +102,21 @@ agent --[shell]--> widgio CLI --[http]--> daemon --[sse]--> browser
 
 - **Daemon**: Hono HTTP server on `127.0.0.1`. Auto-spawned on first call.
 - **Daemon state**: `~/.widgio/server.json` (pid, port, url).
+- **Threads**: `~/.widgio/threads/<id>.json` — one file per widget, plain JSON.
 - **Idle shutdown**: 30 min after last activity.
-- **Buffer**: keeps last 50 widgets so reconnecting browsers replay them.
 
 ## Development
 
 ```bash
-pnpm build     # bundle to dist/
-pnpm typecheck # type-only check
+pnpm install
+pnpm build              # esbuild CLI + Vite web → dist/
+pnpm typecheck
+pnpm dev:web            # Vite dev server with proxy to the running daemon
+```
+
+Local install (for hacking):
+
+```bash
+ln -s "$(pwd)/dist/cli.js" /usr/local/bin/widgio
+chmod +x dist/cli.js
 ```
