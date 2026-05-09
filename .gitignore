@@ -5,6 +5,3 @@ dist
 
 # per-user dev tooling
 .claude/settings.local.json
-
-# scratch / non-source content
-read_me_dump.md

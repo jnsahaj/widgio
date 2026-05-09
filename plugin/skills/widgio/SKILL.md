@@ -25,6 +25,23 @@ Use widgio when a visual would clarify an explanation:
 - A simple text answer suffices.
 - The agent already has a domain-specific MCP tool (Figma, Excalidraw, etc.).
 
+## Plan the response BEFORE drawing — decompose
+
+For pedagogical prompts (*"how does X work"*, *"explain X"*, *"walk me through X"*) the most common failure is cramming everything into one widget. Two unrelated concepts fused into one diagram (overview + zoomed-in mechanism) reads as a mess no matter how well each half is drawn.
+
+**Before calling widgio, list the concepts you'd cover in prose.** If there are 3, you need 3 widgets — one per concept — with prose between them in your normal response text. Each widget makes ONE point.
+
+> **Example.** Asked *"how does an LLM work"*: don't try to show pipeline + tokenization + attention in one widget. Plan 3–5 small ones:
+>   1. Tokenization (input string → token row with IDs)
+>   2. Embedding (tokens → vector blocks)
+>   3. Attention (one query token, fan of weighted lines)
+>   4. Layer stack (slabs + connections)
+>   5. Sampling (logits → next token)
+>
+> Each is one tight diagram. Prose between explains the transition. A tight 1-concept widget beats a dense 3-concept one.
+
+**Promise only what you deliver.** If your text says "let's walk through three steps", emit three widgets. Don't tease and undershoot.
+
 ## Two render modes
 
 widgio supports two delivery patterns:

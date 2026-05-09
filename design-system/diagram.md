@@ -3,6 +3,40 @@
 For SVG diagrams: flowcharts, structural diagrams, illustrative diagrams.
 **Read `core` first.** This module assumes the universal rules from there.
 
+## Failure modes — read these first
+
+Three failures account for most ugly diagrams. Each individually breaks rules below; together they produce a slapdash output. Check each before drawing.
+
+### 1. Two concepts crammed into one diagram
+
+The user asks *"how does X work"*, you reach for ONE diagram, and end up with an overview pipeline jammed against a zoomed-in mechanism. The eye gives up.
+
+**Fix:** Default to MULTIPLE widgets for "how does X work" prompts. Each widget makes ONE point. Write prose between them in your normal response text to connect the points. A tight 1-concept diagram beats a dense 3-concept one. Promise three; deliver three.
+
+A symptom: if you can't name what the diagram makes obvious in ≤5 words, you're trying to do too much. Split.
+
+### 2. Rainbow top row of unrelated colors
+
+5 sibling boxes in a row, colored gray/teal/purple/amber/blue "to make it designful". The colors encode nothing. Reads as 5 independent things, not a sequence.
+
+**Fix:** Same-tier siblings get the SAME color. **ONE ramp per diagram is the default.** Reach for a second ramp only when you can name what the distinction encodes (input vs output, before vs after, active vs idle, role A vs role B). If you can't name it, you don't need it.
+
+### 3. Subtitle that paraphrases the title
+
+`<rect>` with title "Tokens" and subtitle "Pieces". Or "Prompt / Text in". The subtitle is a synonym in fewer words. It adds nothing and steals visual weight from the things that matter (token IDs, weights, counts).
+
+**Fix:** Subtitles are for NEW information — IDs, counts, types, examples. If yours just restates the title, drop it and use a single-line node. When in doubt, ship single-line.
+
+### 4. Curve drawn across a label
+
+Loop arrows return from end to start in linear flows; if their curve passes through the loop's label, the label looks struck through. Same for arrow labels placed on a midpoint that crosses another shape.
+
+**Fix:** Loop labels go ABOVE the curve with ≥12px clearance, OR replace the curve with a small `↻` glyph + text in clear space. Arrow midpoint labels go in clear airspace, never overlapping a stroke.
+
+These four account for the gap between "this looks designed" and "this looks rushed". Re-check each before `widgio end`.
+
+**Diagrams are the hardest widget type** — they have the highest failure rate due to precise coordinate math. Common mistakes: viewBox too small (content clipped), arrows through unrelated boxes, labels sitting on arrow lines, text past viewBox edges, satellite shapes overlapping stages they feed. Double-check coordinates before finalizing.
+
 ## Pick the right type — route on the verb, not the noun
 
 The decision is about *intent*. Ask: is the user trying to *document* this, or *understand* it?
@@ -93,9 +127,9 @@ For sequential processes, cause-and-effect, decision trees.
 
 **When the prompt is over budget:** if the user lists 6+ components ("draw me auth, products, orders, payments, gateway, queue"), don't draw all in one pass. Decompose: (1) a stripped overview with just the boxes and one main flow; (2) one diagram per interesting sub-flow, each with 3–4 nodes.
 
-**Cycles don't get drawn as rings.** If the last stage feeds back into the first (Krebs cycle, event loop, GC mark-and-sweep), don't place stages around a circle. Build a stepper in HTML (see `interactive`). Each panel owns its inputs; nothing collides because nothing shares a canvas. Only fall back to a linear SVG (stages in a row, curved `<path>` return arrow) when there's one input/output total and no per-stage detail.
+**Cycles don't get drawn as rings.** If the last stage feeds back into the first (Krebs cycle, event loop, GC mark-and-sweep, TCP retransmit), your instinct is to place the stages around a circle. Don't. Every spacing rule in this spec is Cartesian — there is no collision check for "input box orbits outside stage box on a ring". You will get satellite boxes overlapping the stages they feed, labels sitting on the dashed circle, and tangential arrows that point nowhere. Build a stepper in HTML (see `interactive`) — each panel owns its inputs; nothing collides because nothing shares a canvas. Only fall back to a linear SVG (stages in a row, curved `<path>` return arrow) when there's one input/output total and no per-stage detail.
 
-**Feedback loops in linear flows.** Use a small `↻` glyph + text near the cycle point: `<text>↻ returns to start</text>`. Or restructure as a circle if the cycle IS the point.
+**Feedback loops in linear flows.** Don't draw a physical arrow traversing the layout — it fights the flow direction, clips edges, and almost always lands on top of a label. Instead, use a small `↻` glyph + text in clear airspace near the cycle point: `<text>↻ returns to start</text>`. Only restructure as a circle if the cycle IS the point.
 
 **Arrows.** A line from A to B must not cross any other box or label. If the direct path crosses something, route around with an L-bend: `<path d="M x1 y1 L x1 ymid L x2 ymid L x2 y2"/>`. Place arrow labels in clear space, not on the midpoint.
 
