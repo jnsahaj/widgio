@@ -41,24 +41,50 @@ The first `widgio show` auto-spawns a detached daemon. It idle-shuts after
 
 ## Agent integration
 
-### Claude Code plugin
+The `widgio` CLI must be on `$PATH` first (see Install above). Agents call it
+via shell. The repo ships skill metadata for two agents today:
 
-The `plugin/` directory is a Claude Code plugin. Install it with:
+### Claude Code
 
-```bash
-# from inside Claude Code:
-/plugin install <path-to-widgio>/plugin
+This repo is a Claude Code plugin marketplace. Install the plugin with:
+
+```text
+# inside Claude Code:
+/plugin marketplace add jnsahaj/widgio
+/plugin install widgio@widgio
 ```
 
-The plugin ships a skill (`plugin/skills/widgio/SKILL.md`) that teaches the
-agent when and how to call `widgio show`. It assumes the `widgio` CLI is on
-`$PATH`.
+This loads `plugin/skills/widgio/SKILL.md` — Claude reads it when it
+detects a request that benefits from a visual.
 
-### Codex / other agents
+To install from a local checkout instead:
 
-Drop the skill markdown into your agent's instruction set, or point it at
-`plugin/skills/widgio/SKILL.md`. The CLI is the universal interface — any
-agent that can run shell commands can use widgio.
+```bash
+/plugin install /absolute/path/to/widgio/plugin
+```
+
+### Codex CLI
+
+Codex reads skills from `~/.agents/skills/<name>/SKILL.md`. The same
+`SKILL.md` file works as-is — copy it once:
+
+```bash
+./scripts/install-codex.sh           # installs to ~/.agents/skills/widgio
+./scripts/install-codex.sh --repo    # installs to ./.agents/skills/widgio (current project only)
+```
+
+Verify Codex picked it up:
+
+```bash
+codex skills list | grep widgio
+```
+
+### Other agents
+
+The CLI is the universal interface — any agent that can run shell commands
+can use widgio. Point it at `plugin/skills/widgio/SKILL.md` (the file is
+plain markdown, no Claude- or OpenAI-specific syntax) and ensure `widgio`
+is on `$PATH`.
 
 ## Architecture
 

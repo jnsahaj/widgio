@@ -1,0 +1,17 @@
+{
+  "name": "widgio",
+  "owner": {
+    "name": "jnsahaj",
+    "url": "https://github.com/jnsahaj"
+  },
+  "plugins": [
+    {
+      "name": "widgio",
+      "source": "./plugin",
+      "description": "Stream animated SVG/HTML widgets from the agent to a browser companion at http://127.0.0.1:4242. Use for diagrams, flows, mockups, charts, and small interactive demos.",
+      "version": "0.1.0",
+      "homepage": "https://github.com/jnsahaj/widgio",
+      "keywords": ["widget", "svg", "diagram", "agent", "visual"]
+    }
+  ]
+}

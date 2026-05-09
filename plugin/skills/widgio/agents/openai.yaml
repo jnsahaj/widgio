@@ -1,0 +1,8 @@
+display_name: widgio
+description: Render animated SVG/HTML widgets in a browser companion
+icon: ti-chart-dots
+policy:
+  allow_implicit_invocation: true
+requires:
+  binaries:
+    - widgio
