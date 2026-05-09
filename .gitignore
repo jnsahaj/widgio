@@ -1,0 +1,10 @@
+node_modules
+dist
+*.log
+.DS_Store
+
+# per-user dev tooling
+.claude/settings.local.json
+
+# scratch / non-source content
+read_me_dump.md

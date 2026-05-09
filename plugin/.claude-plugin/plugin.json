@@ -1,0 +1,11 @@
+{
+  "name": "widgio",
+  "version": "0.1.0",
+  "description": "Stream animated SVG/HTML widgets from the agent to a browser companion at http://127.0.0.1:4242. Skill teaches the agent when and how to call the widgio CLI.",
+  "author": {
+    "name": "Sahaj Jain",
+    "email": "sahaj.jain@vercel.com"
+  },
+  "homepage": "https://github.com/sahaj/widgio",
+  "skills": ["./skills/widgio"]
+}

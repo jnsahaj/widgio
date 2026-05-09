@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "widgio-server",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["dist/server-entry.js"],
+      "port": 4242
+    }
+  ]
+}
