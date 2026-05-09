@@ -1,8 +1,16 @@
 {
   "name": "widgio",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Stream animated SVG/HTML widgets from terminal agents to a browser companion",
-  "keywords": ["widget", "svg", "diagram", "agent", "claude", "codex", "visual"],
+  "keywords": [
+    "widget",
+    "svg",
+    "diagram",
+    "agent",
+    "claude",
+    "codex",
+    "visual"
+  ],
   "author": "Sahaj Jain",
   "license": "MIT",
   "homepage": "https://github.com/jnsahaj/widgio",
