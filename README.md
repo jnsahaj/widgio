@@ -37,10 +37,20 @@ npm i -g widgio          # or: pnpm add -g widgio / yarn global add widgio / bun
 
 ### Install for Claude Code
 
-Inside Claude Code:
+Inside Claude Code, run these as **two separate commands** — paste the
+first, hit return, wait for it to finish, then paste the second. (If you
+paste both at once, Claude Code reads the second line as part of the
+marketplace name and the clone fails.)
+
+**Step 1** — register the marketplace:
 
 ```text
 /plugin marketplace add jnsahaj/widgio
+```
+
+**Step 2** — install the plugin:
+
+```text
 /plugin install widgio@widgio
 ```
 
@@ -107,11 +117,18 @@ widgio stop                      # so the next call spawns a fresh daemon
 
 ### Update the skill (Claude Code)
 
-Inside Claude Code:
+Inside Claude Code, three commands — run each separately, one paste at a
+time:
 
 ```text
 /plugin marketplace update widgio
+```
+
+```text
 /plugin uninstall widgio@widgio
+```
+
+```text
 /plugin install widgio@widgio
 ```
 
