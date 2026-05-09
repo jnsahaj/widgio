@@ -1,6 +1,6 @@
 {
   "name": "widgio",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Stream animated SVG/HTML widgets from terminal agents to a browser companion",
   "keywords": [
     "widget",
