@@ -16,9 +16,9 @@ For data visualization with axes, legends, tooltips: bar, line, scatter, pie, do
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-  Chart.defaults.color = '#a8a8a8';
-  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
-  Chart.defaults.font.family = 'ui-sans-serif, system-ui, sans-serif';
+  Chart.defaults.color = '#a1a1a1';
+  Chart.defaults.borderColor = '#1f1f1f';
+  Chart.defaults.font.family = 'Geist, ui-sans-serif, system-ui, sans-serif';
   Chart.defaults.font.size = 12;
 
   new Chart(document.getElementById('myChart'), {
@@ -28,7 +28,7 @@ For data visualization with axes, legends, tooltips: bar, line, scatter, pie, do
       datasets: [{
         label: 'Revenue',
         data: [12, 19, 8, 15],
-        backgroundColor: '#5b9cff',
+        backgroundColor: '#3291ff',
         borderRadius: 4,
       }]
     },
@@ -37,8 +37,8 @@ For data visualization with axes, legends, tooltips: bar, line, scatter, pie, do
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.06)' } },
-        x: { grid: { display: false } }
+        y: { beginAtZero: true, grid: { color: '#1f1f1f' }, ticks: { font: { family: 'Geist Mono, ui-monospace, monospace' } } },
+        x: { grid: { display: false }, ticks: { font: { family: 'Geist Mono, ui-monospace, monospace' } } }
       }
     }
   });
@@ -59,23 +59,23 @@ For data visualization with axes, legends, tooltips: bar, line, scatter, pie, do
 
 ## Color palette for charts
 
-Hardcode hex from widgio's color palette (since canvas can't read CSS variables). For dark mode, prefer the 200/400 stops (mid-bright):
+Hardcode hex from the widget palette (canvas can't read CSS variables). The default bar/line color is `#3291ff` — the system accent. Reach for additional ramps only when categories are real.
 
 ```js
 const palette = {
-  blue:   '#5b9cff',  // primary
-  teal:   '#5DCAA5',
-  purple: '#AFA9EC',
-  amber:  '#EF9F27',
-  green:  '#97C459',
-  coral:  '#F0997B',
-  pink:   '#ED93B1',
-  red:    '#F09595',
-  gray:   '#a8a8a8',
+  blue:   '#3291ff',  // default accent
+  teal:   '#4DBE9B',
+  purple: '#8C84D9',
+  amber:  '#F5A623',
+  green:  '#87C84B',
+  coral:  '#E88563',
+  pink:   '#E47AA0',
+  red:    '#FF6B6B',
+  gray:   '#a1a1a1',
 };
 ```
 
-Encode meaning, not sequence. Don't cycle through colors decoratively. 2–3 colors per chart unless data is genuinely categorical with many groups.
+Encode meaning, not sequence. Don't cycle through colors decoratively. **Single-series charts use one color (`palette.blue`).** 2–3 colors per chart unless data is genuinely categorical with many groups. Mono is set on tick labels by default — keeps numbers aligned and visually grounded.
 
 ## Number formatting
 
@@ -105,11 +105,11 @@ plugins: { legend: { display: false } }
 ```html
 <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 8px; font-size: 12px; color: var(--color-text-secondary);">
   <span style="display: flex; align-items: center; gap: 4px;">
-    <span style="width: 10px; height: 10px; border-radius: 2px; background: #5b9cff;"></span>
+    <span style="width: 10px; height: 10px; border-radius: 2px; background: #3291ff;"></span>
     Chrome 65%
   </span>
   <span style="display: flex; align-items: center; gap: 4px;">
-    <span style="width: 10px; height: 10px; border-radius: 2px; background: #5DCAA5;"></span>
+    <span style="width: 10px; height: 10px; border-radius: 2px; background: #4DBE9B;"></span>
     Safari 18%
   </span>
 </div>
@@ -123,13 +123,13 @@ For a multi-stat dashboard: wrap summary numbers in metric cards above the chart
 
 ```html
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 1.5rem;">
-  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+  <div style="background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem;">
     <div style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px;">Total revenue</div>
-    <div style="font-size: 24px; font-weight: 500;">$54,200</div>
+    <div style="font-size: 24px; font-weight: 500; font-family: var(--font-mono); letter-spacing: -0.02em;">$54,200</div>
   </div>
-  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+  <div style="background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem;">
     <div style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px;">Best quarter</div>
-    <div style="font-size: 24px; font-weight: 500;">Q2</div>
+    <div style="font-size: 24px; font-weight: 500; font-family: var(--font-mono); letter-spacing: -0.02em;">Q2</div>
   </div>
 </div>
 

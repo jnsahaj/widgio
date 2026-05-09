@@ -85,24 +85,9 @@
     @apply border-b border-border/60;
   }
 
-  /* indeterminate top progress bar — replaces childish pulsing dots */
-  .progress-bar {
-    position: relative;
-    height: 1.5px;
-    overflow: hidden;
-    background: hsl(var(--border) / 0.6);
-  }
-  .progress-bar::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 32%;
-    background: linear-gradient(90deg, transparent, hsl(var(--accent) / 0.85), transparent);
-    animation: indeterminate 1.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-  }
-  @keyframes indeterminate {
-    0% { transform: translateX(-120%); }
-    100% { transform: translateX(420%); }
+  @keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
   }
 }
 

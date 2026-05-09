@@ -21,7 +21,7 @@ A symptom that you've under-structured: if you can't trace each concept's bounda
 
 5 sibling boxes in a row, colored gray/teal/purple/amber/blue "to make it designful". The colors encode nothing. Reads as 5 independent things, not a sequence.
 
-**Fix:** Same-tier siblings get the SAME color. **ONE ramp per diagram is the default.** Reach for a second ramp only when you can name what the distinction encodes (input vs output, before vs after, active vs idle, role A vs role B). If you can't name it, you don't need it.
+**Fix:** Same-tier siblings get the SAME color — **default to `c-gray` for all of them**. Use `c-blue` only on the focal node (the one currently being explained, or the recommended option). Reach for a second categorical ramp only when you can name what the distinction encodes (input vs output, before vs after, active vs idle, role A vs role B). If you can't name it, you don't need it. **A grayscale-plus-one-accent diagram looks more refined than a six-color one.**
 
 ### 3. Subtitle that paraphrases the title
 
@@ -143,7 +143,7 @@ Keep all nodes the same height when they have the same content type (all single-
 
 ```svg
 <g class="node c-blue" onclick="sendPrompt('Tell me more about T-cells')">
-  <rect x="100" y="20" width="180" height="44" rx="8"/>
+  <rect x="100" y="20" width="180" height="44" rx="6"/>
   <text class="th" x="190" y="42" text-anchor="middle" dominant-baseline="central">T-cells</text>
 </g>
 ```
@@ -152,7 +152,7 @@ Keep all nodes the same height when they have the same content type (all single-
 
 ```svg
 <g class="node c-blue" onclick="sendPrompt('Tell me more about dendritic cells')">
-  <rect x="100" y="20" width="200" height="56" rx="8"/>
+  <rect x="100" y="20" width="200" height="56" rx="6"/>
   <text class="th" x="200" y="38" text-anchor="middle" dominant-baseline="central">Dendritic cells</text>
   <text class="ts" x="200" y="56" text-anchor="middle" dominant-baseline="central">Detect foreign antigens</text>
 </g>
@@ -188,8 +188,8 @@ For concepts where physical or logical containment matters — things inside oth
 
 **Container rules.**
 
-- Outermost container: large rounded rect, `rx="20"`–`rx="24"`. Use `c-{ramp}` for fill+stroke. Label at top-left inside, 14px medium.
-- Inner regions: medium rounded rects, `rx="8"`–`rx="12"`. Use a **different ramp** for regions semantically different from their parent.
+- Outermost container: large rounded rect, `rx="14"`. Use `c-{ramp}` for fill+stroke, or stay with the default `box` if the container is neutral. Label at top-left inside, 14px medium.
+- Inner regions: medium rounded rects, `rx="10"`. Use a **different ramp** for regions semantically different from their parent — but most structural diagrams work fine with neutral containers and one accented region.
 - 20px minimum padding inside every container — text and inner regions must not touch container edges.
 - Max 2–3 nesting levels. Deeper gets unreadable at 680px.
 
@@ -215,7 +215,7 @@ ViewBox 700×320. Color classes handle dark mode automatically.
   </marker>
 </defs>
 <g class="c-green">
-  <rect x="120" y="30" width="560" height="260" rx="20"/>
+  <rect x="120" y="30" width="560" height="260" rx="14"/>
   <text class="th" x="400" y="62" text-anchor="middle">Library branch</text>
   <text class="ts" x="400" y="80" text-anchor="middle">Main floor</text>
 </g>
@@ -225,12 +225,12 @@ ViewBox 700×320. Color classes handle dark mode automatically.
 
 ```svg
 <g class="c-teal">
-  <rect x="150" y="100" width="220" height="160" rx="12"/>
+  <rect x="150" y="100" width="220" height="160" rx="10"/>
   <text class="th" x="260" y="130" text-anchor="middle">Circulation desk</text>
   <text class="ts" x="260" y="148" text-anchor="middle">Checkouts, returns</text>
 </g>
 <g class="c-amber">
-  <rect x="450" y="100" width="210" height="160" rx="12"/>
+  <rect x="450" y="100" width="210" height="160" rx="10"/>
   <text class="th" x="555" y="130" text-anchor="middle">Reading room</text>
   <text class="ts" x="555" y="148" text-anchor="middle">Seating, reference</text>
 </g>
@@ -245,7 +245,7 @@ ViewBox 700×320. Color classes handle dark mode automatically.
 <line x1="75" y1="185" x2="118" y2="185" class="arr" marker-end="url(#arrow)"/>
 ```
 
-**Color in structural diagrams.** Nested regions need distinct ramps — same class on parent and child gives identical fills and flattens the hierarchy. Pick a *related* ramp for inner structures (Green envelope, Teal circulation desk inside) and a *contrasting* ramp for a region doing something functionally different (Amber reading room).
+**Color in structural diagrams.** When you do use color, nested regions need distinct ramps — same class on parent and child gives identical fills and flattens the hierarchy. Pick a *related* ramp for inner structures and a *contrasting* ramp for a region doing something functionally different. The grayscale-plus-accent default still applies first: try a neutral container with one `c-blue` region before reaching for a multi-color scheme.
 
 **Database schemas / ERDs — use mermaid.js, not SVG.** See `interactive` module.
 

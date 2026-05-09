@@ -20,7 +20,16 @@ export function Canvas({ threadId }: { threadId: string | null }) {
     );
   }
   if (!data) {
-    return <main className="h-full" />;
+    return (
+      <main className="flex h-full flex-col">
+        <div className="h-14 border-b border-border/60" />
+        <div className="scrollbar-thin flex-1 overflow-auto px-12 py-10">
+          <div className="mx-auto max-w-[800px]">
+            <div className="h-[420px] rounded-lg border border-border/40 bg-card/30 motion-safe:animate-[skeleton-pulse_1.6s_ease-in-out_infinite]" />
+          </div>
+        </div>
+      </main>
+    );
   }
   // Keying on threadId resets ThreadView state (streaming flag, frame DOM,
   // applied chunks) on navigation — no manual reset effects needed.
@@ -79,10 +88,10 @@ function ThreadView({ thread, initialStreaming }: ThreadViewProps) {
 
   return (
     <main className="relative flex h-full flex-col">
-      {stream.streaming && <div className="progress-bar" />}
       <Toolbar
         title={thread.title}
         caption={stream.caption}
+        streaming={stream.streaming}
         code={stream.liveCode}
         mode={thread.mode}
       />
@@ -100,11 +109,13 @@ function ThreadView({ thread, initialStreaming }: ThreadViewProps) {
 function Toolbar({
   title,
   caption,
+  streaming,
   code,
   mode,
 }: {
   title: string;
   caption: string;
+  streaming: boolean;
   code: string;
   mode: WidgetMode;
 }) {
@@ -117,12 +128,18 @@ function Toolbar({
   };
 
   return (
-    <div className="flex h-12 items-center justify-between border-b border-border/60 px-6">
-      <div className="flex items-baseline gap-3 min-w-0">
-        <h1 className="truncate text-[13px] font-medium text-foreground">{title}</h1>
-        {caption && (
-          <span className="truncate font-mono text-[11px] text-muted-foreground/80">
-            {caption}
+    <div className="flex h-14 items-center justify-between border-b border-border/60 px-6">
+      <div className="flex min-w-0 items-center gap-3">
+        <h1 className="truncate text-[15.5px] font-semibold tracking-tight text-foreground">
+          {title}
+        </h1>
+        {streaming && (
+          <span className="inline-flex shrink-0 items-center gap-1.5 truncate text-[11.5px] text-muted-foreground">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/70" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+            </span>
+            <span className="truncate">{caption || "Drawing"}</span>
           </span>
         )}
       </div>

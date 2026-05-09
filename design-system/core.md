@@ -26,7 +26,7 @@ widgio supports two delivery patterns:
 ## Philosophy
 
 - **Compact.** Show the essential inline. Explain the rest in your response text.
-- **Flat.** No gradients (one exception in illustrative diagrams), no drop shadows, no blur, no glow, no neon. Solid flat fills.
+- **Flat, but defined.** No gradients (one exception in illustrative diagrams), no drop shadows, no blur, no glow, no neon. Solid flat fills, visible 1px borders. Lines should be *seen*, not *suggested* — hairline strokes look like a rendering bug at this surface contrast.
 - **Text goes in your response, visuals go in the widget.** All explanatory paragraphs, intros, and summaries live in your normal response text **outside** the widget. The widget output should contain ONLY the visual element. Never put descriptive prose, section headings, or wall-of-text inside the SVG/HTML.
 
 ## Complexity budget — hard limits
@@ -44,10 +44,11 @@ If you catch yourself writing "click to learn more" in prose, the widget itself 
 - No emoji in widget content. Use Tabler icons (`<i class="ti ti-NAME"></i>` — outline only, e.g. `ti-home`, `ti-arrow-right`, `ti-check`, `ti-x`, `ti-chart-bar`, `ti-bell`, `ti-mail`, `ti-search`, `ti-settings`, `ti-user`). Inherits color and font-size from parent. Decorative icons get `aria-hidden="true"`. Never invent `-filled` variants — they aren't loaded.
 - No gradients, drop shadows, blur, glow, or neon effects. (Illustrative diagrams may use ONE `<linearGradient>` to show a continuous physical property — see `diagram` module.)
 - No dark/colored backgrounds on outer containers — widgio's surface already provides them. The widget content should be transparent.
-- **Headings:** h1 = 22px, h2 = 18px, h3 = 16px — all `font-weight: 500`. Body text = 13px, weight 400, `line-height: 1.7`. **Two weights only: 400 regular, 500 medium.** Never 600/700.
+- **Headings:** h1 = 22px, h2 = 18px, h3 = 16px — all `font-weight: 500` with negative letter-spacing (already wired into the runtime, don't override). Body text = 13px, weight 400, `line-height: 1.7`. **Two weights only: 400 regular, 500 medium.** Never 600/700.
 - **Sentence case** always. Never Title Case, never ALL CAPS. Applies to SVG text labels and HTML headings.
 - **No mid-sentence bolding.** Function names and code identifiers go in `<code>` not `<strong>`. Bold is for headings and labels only.
-- **Corners:** use `var(--border-radius-md)` (8px) or `-lg` (12px) for cards in HTML. In SVG, `rx="4"` is default; only larger values for emphasized rounding or pills.
+- **Mono for technical labels.** Use `var(--font-mono)` (or the SVG `tm` class) for token IDs, hashes, counts, file paths, code identifiers, status counters. Use sans for everything else. Mixing the two — sans for prose labels, mono for the value — is the system's signature.
+- **Corners:** use `var(--border-radius-md)` (6px) or `-lg` (10px) for cards in HTML. In SVG, `rx="6"` is default; `rx="10"` for emphasized rounding; `rx="999"` for full pills.
 - **No rounded corners on single-sided borders.** If using `border-left` or `border-top` accents, set `border-radius: 0`.
 - **No titles or prose inside the widget output.** See Philosophy above.
 - **Icon sizing:** Tabler `<i>` sizes via `font-size` — 16–20px inline, 24px max decorative.
@@ -58,45 +59,61 @@ If you catch yourself writing "click to learn more" in prose, the widget itself 
 
 ## CSS variables (use these, don't hardcode colors)
 
-**Backgrounds:** `--color-background-primary` (widget card), `-secondary` (raised surface), `-tertiary` (page bg), `-info`, `-danger`, `-success`, `-warning`
+**Backgrounds:** `--color-background-primary` (#000 — page base), `-secondary` (#0a0a0a — raised surface, default for cards), `-tertiary` (#111 — hover lift), `-info`, `-danger`, `-success`, `-warning`
 
-**Text:** `--color-text-primary`, `-secondary` (muted), `-tertiary` (hints), `-info`, `-danger`, `-success`, `-warning`
+**Text:** `--color-text-primary` (#fafafa), `-secondary` (#a1a1a1, muted), `-tertiary` (#666, hints), `-info`, `-danger`, `-success`, `-warning`
 
-**Borders:** `--color-border-tertiary` (default 0.08α), `-secondary` (hover 0.16α), `-primary` (0.24α), semantic `-info/-danger/-success/-warning`
+**Borders:** `--color-border-tertiary` (#1f1f1f — quietest), `-secondary` (#2a2a2a — default), `-primary` (#444 — emphasis/hover), semantic `-info` (#0070f3) `-danger` `-success` `-warning`. **All borders are solid 1px** — no rgba hairlines.
 
-**Typography:** `--font-sans`, `--font-serif`, `--font-mono`
+**Typography:** `--font-sans` (Geist), `--font-serif`, `--font-mono` (Geist Mono). Both webfonts ship with the iframe. The SVG `t/ts/th` classes already use sans; the `tm` class uses mono.
 
-**Layout:** `--border-radius-md` (8px), `--border-radius-lg` (12px — preferred for cards), `--border-radius-xl` (16px)
+**Layout:** `--border-radius-sm` (4px — pills, small chips), `--border-radius-md` (6px — default, inputs/buttons/most cards), `--border-radius-lg` (10px — emphasized cards), `--border-radius-xl` (14px — outer containers in structural diagrams).
 
-widgio renders in **forced dark mode** (black base, near-black surfaces, off-white text). All variables are pre-resolved for that. **Never hardcode `color: #333` or `background: white`** — they'll be invisible. Use the variables.
+widgio renders in **forced dark mode** (true black base, near-black surfaces, off-white text). All variables are pre-resolved for that. **Never hardcode `color: #333` or `background: white`** — they'll be invisible. Use the variables.
 
-## Color palette — 9 ramps
+## Color philosophy — neutrals first
 
-For categorical coloring in diagrams and UI badges. 7 stops per ramp from lightest to darkest. The CSS classes below are pre-loaded for SVG (`c-blue`, `c-teal`, etc.) — they auto-set fill, stroke, and child text color for widgio's dark theme.
+The default for any diagram is **monochrome**: `c-gray` (or unstyled `box`) for every node, with neutral connectors. Reach for color only when it encodes something specific. A confidently grayscale diagram with one accent reads more refined than a six-color one — the eye sees structure, not decoration.
 
-| Class      | Ramp   | 50      | 100     | 200     | 400     | 600     | 800     | 900     |
-|------------|--------|---------|---------|---------|---------|---------|---------|---------|
-| `c-purple` | Purple | #EEEDFE | #CECBF6 | #AFA9EC | #7F77DD | #534AB7 | #3C3489 | #26215C |
-| `c-teal`   | Teal   | #E1F5EE | #9FE1CB | #5DCAA5 | #1D9E75 | #0F6E56 | #085041 | #04342C |
-| `c-coral`  | Coral  | #FAECE7 | #F5C4B3 | #F0997B | #D85A30 | #993C1D | #712B13 | #4A1B0C |
-| `c-pink`   | Pink   | #FBEAF0 | #F4C0D1 | #ED93B1 | #D4537E | #993556 | #72243E | #4B1528 |
-| `c-gray`   | Gray   | #F1EFE8 | #D3D1C7 | #B4B2A9 | #888780 | #5F5E5A | #444441 | #2C2C2A |
-| `c-blue`   | Blue   | #E6F1FB | #B5D4F4 | #85B7EB | #378ADD | #185FA5 | #0C447C | #042C53 |
-| `c-green`  | Green  | #EAF3DE | #C0DD97 | #97C459 | #639922 | #3B6D11 | #27500A | #173404 |
-| `c-amber`  | Amber  | #FAEEDA | #FAC775 | #EF9F27 | #BA7517 | #854F0B | #633806 | #412402 |
-| `c-red`    | Red    | #FCEBEB | #F7C1C1 | #F09595 | #E24B4A | #A32D2D | #791F1F | #501313 |
+**The accent is `c-blue`.** It's the system's voice color — use it for the focal node, the highlighted path, the "this one" in a comparison. Most diagrams should have at most one `c-blue` element.
 
-**How to assign colors:** Color encodes meaning, not sequence. Don't cycle through colors like a rainbow. Instead:
+Categorical color is the exception, not the default. Use it when:
 
-- **Group by category** — all nodes of the same type share one color. (Vaccine diagram: immune cells = purple, pathogens = coral, outcomes = teal.)
+- A diagram genuinely has multiple distinct categories that the user needs to track across the figure (immune cells vs pathogens vs outcomes; producer vs consumer vs broker).
+- Color encodes a physical property in an illustrative diagram (warm = heat, cool = calm, green = organic).
+
+Otherwise, stay grayscale + accent.
+
+## Color palette — 9 ramps (when categorical color is warranted)
+
+For when you've decided categorical color is earning its keep. CSS classes are pre-loaded for SVG (`c-blue`, `c-teal`, etc.) — they auto-set fill, stroke, and child text color for the dark surface.
+
+The runtime tunes each ramp into three values: a deep fill, a mid stroke, and a bright label color. Reference values for hand-picked use (badges, charts, illustrative diagrams):
+
+| Class      | Ramp   | Fill    | Stroke  | Label   |
+|------------|--------|---------|---------|---------|
+| `c-blue`   | Blue   | #002F66 | #3291FF | #BCDDFF |
+| `c-purple` | Purple | #2A2566 | #8C84D9 | #D8D4F8 |
+| `c-teal`   | Teal   | #003D33 | #4DBE9B | #B2EAD6 |
+| `c-coral`  | Coral  | #5A1F0E | #E88563 | #F5C9B8 |
+| `c-pink`   | Pink   | #5A1A30 | #E47AA0 | #F5C5D7 |
+| `c-green`  | Green  | #0F3D08 | #87C84B | #C8E5A2 |
+| `c-amber`  | Amber  | #4A2A04 | #F5A623 | #FBD89A |
+| `c-red`    | Red    | #5A0F0F | #FF6B6B | #FCC8C8 |
+| `c-gray`   | Gray   | #161616 | #444444 | #d4d4d4 |
+
+**How to assign colors:**
+
+- **Default to `c-gray`.** Same-tier siblings get the *same* color (almost always gray).
+- **Reserve `c-blue` for the accent** — the focal node, the recommended option, the active stage in a flow. One per diagram is the target.
+- **Group by category** when category is real — all nodes of the same type share one color. Pick from the categorical ramps (`c-purple`, `c-teal`, `c-coral`, `c-pink`).
 - **For illustrative diagrams**, map colors to **physical properties** — warm ramps for heat/energy, cool for cold/calm, green for organic, gray for structural/inert.
-- Use **gray for neutral/structural** nodes (start, end, generic steps).
-- **2–3 colors per diagram, not 6+.** A diagram with gray + purple + teal is cleaner than one using every ramp.
-- **Prefer purple, teal, coral, pink** for general categories. Reserve blue/green/amber/red for nodes representing informational/success/warning/error concepts — those carry strong UI semantics.
+- **2–3 colors per diagram, never 6+.** Gray + blue + one categorical accent is enough.
+- **Reserve `c-green/-amber/-red` for semantic meaning** — success, warning, error. Don't use them as decorative categories or you confuse the reader.
 
-**Text on colored backgrounds:** widgio's `c-*` classes auto-handle this for SVG. For HTML badges, use the 100/200 stop from the same ramp on top of an 800/900 fill (or the inverse for light fills if you ever want them) — never `color: black` or `color: white`.
+**Text on colored backgrounds:** the `c-*` SVG classes auto-handle this. For HTML badges, use the Label color on top of the Fill color from the same ramp via inline style — never `color: black` or `color: white`.
 
-**Light/dark stops widgio uses (already wired into `c-*`):** 800 fill, 200 stroke, 100 title text, 200 subtitle text. Apply `c-{ramp}` to a `<g>` wrapping shape+text, or directly to a `<rect>`/`<circle>`/`<ellipse>`. Never to `<path>` — paths don't get ramp fill. For colored connector strokes use inline `stroke="#..."` (any 200/400 stop works).
+**Apply `c-{ramp}`** to a `<g>` wrapping shape+text, or directly to a `<rect>`/`<circle>`/`<ellipse>`. Never to `<path>` — paths don't get ramp fill. For colored connector strokes, use inline `stroke="#..."` with the Stroke value from the table above.
 
 ## sendPrompt(text)
 
@@ -150,27 +167,28 @@ When streaming an SVG with `widgio start --mode svg --viewBox "0 0 680 H"`, widg
 - No decorative step numbers, oversized headings outside boxes.
 - No icons or illustrations inside boxes — text only. (Exception: illustrative diagrams may use simple shape-based indicators inside drawn objects.)
 - Sentence case on all labels.
-- **Stroke width:** 0.5px for diagram borders and edges. Not 1px or 2px. Thin strokes feel refined.
+- **Stroke width:** 1px for node borders, 1px for connector arrows. The runtime classes are already set to 1px — don't override. Thicker than 1px is reserved for highlight rings (1.5px max) and illustrative-diagram emphasis lines.
 - **Connector paths need `fill="none"`.** SVG defaults to `fill: black` — a curved connector without `fill="none"` renders as a huge black shape. Every `<path>` or `<polyline>` used as a connector/arrow MUST have `fill="none"`.
-- **Rect rounding:** `rx="4"` for subtle. `rx="8"` max for emphasized. `rx ≥ height/2` = pill — deliberate only.
+- **Rect rounding:** `rx="6"` is the default. `rx="10"` for emphasized cards. `rx ≥ height/2` = pill — deliberate only.
 - **No rotated text.** `<defs>` may contain the arrow marker, an optional `<clipPath>`, subtle `<pattern>` fills used as a secondary cue alongside color, and — in illustrative diagrams only — a single `<linearGradient>`. Nothing else.
 
 ## Pre-built SVG classes (already loaded by widgio)
 
 - `class="t"` = sans 14px primary
 - `class="ts"` = sans 12px secondary
-- `class="th"` = sans 14px medium (500)
-- `class="box"` = neutral rect (secondary fill, tertiary border)
+- `class="th"` = sans 14px medium (500), with negative letter-spacing — use for node titles
+- `class="tm"` = mono 12px secondary — use for token IDs, hashes, counts, file paths, code identifiers, anything technical
+- `class="box"` = neutral rect (secondary fill, secondary 1px border)
 - `class="node"` = clickable group with hover effect
-- `class="arr"` = arrow line (1.5px, rounded cap, secondary stroke)
-- `class="leader"` = dashed leader line (0.5px, tertiary stroke)
-- `class="c-{ramp}"` = colored node (`c-blue`, `c-teal`, `c-amber`, `c-green`, `c-red`, `c-purple`, `c-coral`, `c-pink`, `c-gray`). Apply to `<g>` or shape (rect/circle/ellipse) — NOT to paths. Sets fill+stroke and auto-adjusts child `t`/`ts`/`th` text color.
+- `class="arr"` = arrow line (1px, rounded cap, secondary stroke)
+- `class="leader"` = dashed leader line (0.75px, tertiary stroke)
+- `class="c-{ramp}"` = colored node (`c-blue`, `c-teal`, `c-amber`, `c-green`, `c-red`, `c-purple`, `c-coral`, `c-pink`, `c-gray`). Apply to `<g>` or shape (rect/circle/ellipse) — NOT to paths. Sets fill+stroke (1px) and auto-adjusts child `t`/`ts`/`th` text color.
 
 **`c-{ramp}` nesting rule:** these classes use direct-child selectors. Nest a `<g>` inside `<g class="c-blue">` and the inner shapes become grandchildren — they lose the fill. Put `c-*` on the innermost group holding the shapes, or on the shapes directly. If you need click handlers, put `onclick` on the `c-*` group itself.
 
-## Font size calibration (Anthropic Sans is unavailable in widgio — system sans is used)
+## Font size calibration
 
-System sans is slightly more compact than Anthropic Sans. Char widths approximate:
+The runtime ships Geist Sans and Geist Mono via webfont. Char widths approximate (Geist 14px medium):
 
 ```
 text                                      chars  weight  size  width

@@ -30,7 +30,7 @@ export function Sidebar({ threads, currentId, onSelect, onArchive, onDelete }: P
 
   return (
     <aside className="flex h-full flex-col border-r border-border/60 bg-card/40">
-      <header className="flex h-12 items-center justify-between border-b border-border/60 px-4">
+      <header className="flex h-14 items-center justify-between border-b border-border/60 px-4">
         <span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
           widgio
         </span>

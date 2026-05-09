@@ -101,12 +101,12 @@ Chunked, this would be 4 chunks: sky + gradient defs → sun → mountain layers
   <title>Radial geometric pattern</title>
   <desc>Twelve-fold rotational symmetry built from overlapping arcs.</desc>
   <g transform="translate(340 340)">
-    <g><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#5b9cff" stroke-width="1"/></g>
-    <g transform="rotate(30)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#5DCAA5" stroke-width="1"/></g>
-    <g transform="rotate(60)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#AFA9EC" stroke-width="1"/></g>
-    <g transform="rotate(90)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#EF9F27" stroke-width="1"/></g>
-    <g transform="rotate(120)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#F0997B" stroke-width="1"/></g>
-    <g transform="rotate(150)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#ED93B1" stroke-width="1"/></g>
+    <g><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#3291FF" stroke-width="1"/></g>
+    <g transform="rotate(30)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#4DBE9B" stroke-width="1"/></g>
+    <g transform="rotate(60)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#8C84D9" stroke-width="1"/></g>
+    <g transform="rotate(90)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#F5A623" stroke-width="1"/></g>
+    <g transform="rotate(120)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#E88563" stroke-width="1"/></g>
+    <g transform="rotate(150)"><path d="M0 -240 Q 80 -120 0 0 Q -80 -120 0 -240 Z" fill="none" stroke="#E47AA0" stroke-width="1"/></g>
     <!-- ...repeat for 180, 210, 240, 270, 300, 330 -->
   </g>
 </svg>

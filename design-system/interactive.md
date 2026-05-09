@@ -25,12 +25,12 @@ Use HTML for the controls — sliders, buttons, live readouts. Keep prose explan
 <div style="display: flex; align-items: center; gap: 12px; margin: 0 0 1.5rem;">
   <label style="font-size: 14px; color: var(--color-text-secondary);">Years</label>
   <input type="range" min="1" max="40" value="20" step="1" id="years" style="flex: 1;" />
-  <span style="font-size: 14px; font-weight: 500; min-width: 24px;" id="years-out">20</span>
+  <span style="font-size: 14px; font-weight: 500; min-width: 24px; font-family: var(--font-mono);" id="years-out">20</span>
 </div>
 
 <div style="display: flex; align-items: baseline; gap: 8px; margin: 0 0 1.5rem;">
   <span style="font-size: 14px; color: var(--color-text-secondary);">£1,000 →</span>
-  <span style="font-size: 24px; font-weight: 500;" id="result">£3,870</span>
+  <span style="font-size: 24px; font-weight: 500; font-family: var(--font-mono); letter-spacing: -0.02em;" id="result">£3,870</span>
 </div>
 
 <div style="margin: 2rem 0; position: relative; height: 240px;">
@@ -46,8 +46,8 @@ Use HTML for the controls — sliders, buttons, live readouts. Keep prose explan
   }
   const chart = new Chart(document.getElementById('chart'), {
     type: 'line',
-    data: { labels: Array.from({ length: 21 }, (_, i) => i), datasets: [{ data: compute(20), borderColor: '#5b9cff', backgroundColor: 'rgba(91,156,255,0.12)', fill: true, tension: 0.2, pointRadius: 0 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#a8a8a8' }, grid: { color: 'rgba(255,255,255,0.06)' } }, x: { ticks: { color: '#a8a8a8' }, grid: { display: false } } } }
+    data: { labels: Array.from({ length: 21 }, (_, i) => i), datasets: [{ data: compute(20), borderColor: '#3291ff', backgroundColor: 'rgba(50,145,255,0.12)', fill: true, tension: 0.2, pointRadius: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#a1a1a1' }, grid: { color: '#1f1f1f' } }, x: { ticks: { color: '#a1a1a1' }, grid: { display: false } } } }
   });
   document.getElementById('years').addEventListener('input', (e) => {
     const y = +e.target.value;
@@ -75,7 +75,7 @@ One panel per stage, dot indicators (● ○ ○) showing position, Next wraps f
 <div id="stepper" style="margin: 0;">
   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
     <div id="dots" style="display: flex; gap: 6px;"></div>
-    <div id="counter" style="font-size: 12px; color: var(--color-text-secondary); font-family: var(--font-mono);">1 / 6</div>
+    <div id="counter" style="font-size: 12px; color: var(--color-text-secondary); font-family: var(--font-mono);">01 / 06</div>
   </div>
   <div id="panels"></div>
   <div style="display: flex; gap: 8px; margin-top: 1rem; justify-content: flex-end;">
@@ -99,7 +99,7 @@ One panel per stage, dot indicators (● ○ ○) showing position, Next wraps f
   const counter = document.getElementById('counter');
   function render() {
     dots.innerHTML = stages.map((_, k) => `<span style="width:6px;height:6px;border-radius:50%;background:${k === i ? 'var(--color-text-primary)' : 'var(--color-border-secondary)'};"></span>`).join('');
-    counter.textContent = `${i + 1} / ${stages.length}`;
+    counter.textContent = `${String(i + 1).padStart(2, '0')} / ${String(stages.length).padStart(2, '0')}`;
     const s = stages[i];
     panels.innerHTML = `
       <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem 1.5rem; min-height: 120px;">
@@ -138,13 +138,13 @@ Database schemas — use mermaid's `erDiagram`, not hand-drawn SVG. Layout, card
     themeVariables: {
       darkMode: true,
       fontSize: '13px',
-      fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-      lineColor: '#9c9a92',
-      textColor: '#c2c0b6',
-      mainBkg: '#141414',
-      primaryColor: '#141414',
-      primaryBorderColor: 'rgba(255,255,255,0.16)',
-      primaryTextColor: '#ededed',
+      fontFamily: 'Geist, ui-sans-serif, system-ui, sans-serif',
+      lineColor: '#666',
+      textColor: '#a1a1a1',
+      mainBkg: '#0a0a0a',
+      primaryColor: '#0a0a0a',
+      primaryBorderColor: '#2a2a2a',
+      primaryTextColor: '#fafafa',
     },
   });
   const { svg } = await mermaid.render('erd-svg', `erDiagram
@@ -176,7 +176,7 @@ Database schemas — use mermaid's `erDiagram`, not hand-drawn SVG. Layout, card
     const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     rect.setAttribute('x', x); rect.setAttribute('y', y);
     rect.setAttribute('width', w); rect.setAttribute('height', h);
-    rect.setAttribute('rx', '8');
+    rect.setAttribute('rx', '6');
     for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
       if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
     }

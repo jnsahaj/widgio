@@ -22,17 +22,18 @@ The widget container is ~680px wide. Use `repeat(auto-fit, minmax(160px, 1fr))` 
 
 ## Aesthetic
 
-Flat, clean surfaces. Minimal 0.5px borders. Generous whitespace. No gradients, no shadows (except functional focus rings on inputs). Everything should feel native to widgio's dark theme.
+Flat, clean surfaces with **defined** 1px borders — the borders are seen, not suggested. Generous whitespace. Tight headings (negative letter-spacing, already wired in — don't override). Mono for any technical or numeric value. No gradients, no shadows (except functional focus rings on inputs). Everything should feel native to the true-black surface.
 
 ## Tokens
 
-- **Borders:** always `0.5px solid var(--color-border-tertiary)` (or `-secondary` for emphasis).
-- **Corner radius:** `var(--border-radius-md)` for most elements, `var(--border-radius-lg)` for cards.
-- **Cards:** `background: var(--color-background-primary)`, 0.5px border, `radius-lg`, padding `1rem 1.25rem`.
-- **Form elements** (input, select, textarea, button, range slider) are pre-styled in widgio's iframe shell — write bare tags. Inputs are 36px tall with hover/focus built in; range sliders have a 4px track + 18px thumb; buttons have outline style with hover/active. Add inline styles only to override (e.g., width).
-- **Buttons:** transparent bg, 0.5px secondary border, hover bg-secondary, active scale(0.98). If a button triggers `sendPrompt`, append a `↗` arrow to the label.
+- **Borders:** always `1px solid var(--color-border-secondary)` for cards (default emphasis); `--color-border-tertiary` for quieter dividers; `--color-border-primary` for hover/emphasis.
+- **Corner radius:** `var(--border-radius-md)` (6px) for most elements, `var(--border-radius-lg)` (10px) for emphasized cards.
+- **Cards:** `background: var(--color-background-secondary)`, 1px secondary border, `radius-md`, padding `1rem 1.25rem`. (Use `--color-background-primary` only for editorial layouts where the card should dissolve into the page.)
+- **Form elements** (input, select, textarea, button, range slider) are pre-styled in widgio's iframe shell — write bare tags. Inputs are 36px tall with hover/focus built in; range sliders have a 4px track + 18px thumb; buttons have a low-contrast filled style with hover/active. Add inline styles only to override (e.g., width).
+- **Buttons:** secondary-bg by default, 1px secondary border, hover lifts to tertiary-bg, active scale(0.98). If a button triggers `sendPrompt`, append a `↗` arrow to the label.
 - **Spacing:** rem for vertical rhythm (1rem, 1.5rem, 2rem), px for component-internal gaps (8px, 12px, 16px).
 - **Box-shadows:** none, except functional focus rings (`box-shadow: 0 0 0 3px var(--color-background-info)` already on inputs).
+- **Mono accents:** any numeric value, ID, or technical label gets `font-family: var(--font-mono)`. Big stat numbers ("$48,200", "312") and timestamps look noticeably better in mono. Prose labels stay sans.
 
 ## Layout patterns
 
@@ -48,17 +49,17 @@ Contained mockups — mobile screens, chat threads, single cards, modals, small 
 
 ## Metric cards
 
-For summary numbers (revenue, count, percentage) — surface card with muted 13px label above, 24px/500 number below. `background: var(--color-background-secondary)`, no border, `border-radius: var(--border-radius-md)`, padding `1rem`. Use in grids of 2–4 with `gap: 12px`.
+For summary numbers (revenue, count, percentage) — surface card with muted 13px sans label above, 24px/500 mono number below. The mono number is the system's signature for stats. `background: var(--color-background-secondary)`, 1px tertiary border, `border-radius: var(--border-radius-md)`, padding `1rem`. Use in grids of 2–4 with `gap: 12px`.
 
 ```html
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0 0 1.5rem;">
-  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+  <div style="background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem;">
     <div style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px;">Revenue</div>
-    <div style="font-size: 24px; font-weight: 500;">$48,200</div>
+    <div style="font-size: 24px; font-weight: 500; font-family: var(--font-mono); letter-spacing: -0.02em;">$48,200</div>
   </div>
-  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem;">
+  <div style="background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem;">
     <div style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px;">Customers</div>
-    <div style="font-size: 24px; font-weight: 500;">312</div>
+    <div style="font-size: 24px; font-weight: 500; font-family: var(--font-mono); letter-spacing: -0.02em;">312</div>
   </div>
 </div>
 ```
@@ -70,12 +71,12 @@ For summary numbers (revenue, count, percentage) — surface card with muted 13p
 Side-by-side card grid for options. Highlight differences with semantic colors. Each option in a card with badges for key differentiators. A leading Tabler icon (`<i class="ti ti-NAME">` at 20px, `aria-hidden`) anchors each option visually — pick the most apt name per option.
 
 - Don't put comparison tables inside this widget — output them as markdown tables in your response text. The widget is for the visual card grid only.
-- When one option is recommended or "most popular", accent its card with `border: 2px solid var(--color-border-info)` only (2px is deliberate — the only exception to the 0.5px rule). Keep the same background as the other cards. Add a small badge (e.g. "Most popular") inside the card header using `background: var(--color-background-info); color: var(--color-text-info); font-size: 12px; padding: 4px 12px; border-radius: var(--border-radius-md); display: inline-block;`.
+- When one option is recommended or "most popular", accent its card with `border: 2px solid var(--color-border-info)` only (2px is deliberate — the only exception to the 1px rule). Keep the same background as the other cards. Add a small badge (e.g. "Most popular") inside the card header using `background: var(--color-background-info); color: var(--color-text-info); font-size: 12px; padding: 4px 12px; border-radius: var(--border-radius-md); display: inline-block;`.
 - Add `sendPrompt()` buttons for drill-downs: `<button onclick="sendPrompt('Tell me more about the Pro plan')">Learn more ↗</button>`.
 
 ```html
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem;">
+  <div style="background: var(--color-background-primary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem;">
     <i class="ti ti-rocket" style="font-size: 20px; color: var(--color-text-secondary);" aria-hidden="true"></i>
     <h3 style="font-size: 16px; font-weight: 500; margin: 8px 0 4px;">Starter</h3>
     <p style="font-size: 24px; font-weight: 500; margin: 0 0 8px;">$9 <span style="font-size: 13px; color: var(--color-text-secondary); font-weight: 400;">/ mo</span></p>
@@ -109,7 +110,7 @@ Each card is a complete top-level element (a `<div>`), so chunk boundaries are c
 Wrap the entire thing in a single raised card. All content sans-serif. Use an avatar/initials circle for people.
 
 ```html
-<div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1rem 1.25rem;">
+<div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 1px solid var(--color-border-tertiary); padding: 1rem 1.25rem;">
   <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
     <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--color-background-info); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 14px; color: var(--color-text-info);">MR</div>
     <div>
@@ -117,7 +118,7 @@ Wrap the entire thing in a single raised card. All content sans-serif. Use an av
       <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0;">VP of Engineering</p>
     </div>
   </div>
-  <div style="border-top: 0.5px solid var(--color-border-tertiary); padding-top: 12px;">
+  <div style="border-top: 1px solid var(--color-border-tertiary); padding-top: 12px;">
     <table style="width: 100%; font-size: 13px;">
       <tr>
         <td style="color: var(--color-text-secondary); padding: 4px 0;">
@@ -146,7 +147,7 @@ For status indicators within cards. Use semantic backgrounds with matching text 
 <span style="background: var(--color-background-danger); color: var(--color-text-danger); font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px;">Failed</span>
 ```
 
-For categorical (non-semantic) badges, use the SVG color ramps' 100/200 stops as background and 100 stop as text — applied via inline `style="background: #3C3489; color: #CECBF6;"`.
+For categorical (non-semantic) badges, use a ramp's Fill as background and Label as text from the table in `core` — e.g. `style="background: #2A2566; color: #D8D4F8;"` (purple). Default to the semantic palette above unless category is meaningful.
 
 ## When nothing fits
 
