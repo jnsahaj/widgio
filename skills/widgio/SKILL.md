@@ -17,9 +17,8 @@ command -v widgio || npm install -g widgio
 ```
 
 That's a no-op if `widgio` is already on `$PATH`, and a one-time global
-install otherwise (~3 seconds). The widgio Claude Code / Codex plugin
-ships only the skill — it can't install the binary for the user, so this
-check belongs in your flow.
+install otherwise (~3 seconds). The widgio skill can't install the binary
+for the user, so this check belongs in your flow.
 
 **If the install fails** (permission denied, registry unreachable, etc.):
 tell the user, suggest `sudo npm install -g widgio` *only if it's a

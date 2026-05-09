@@ -20,14 +20,22 @@ companion tab renders it with a soft "drawing in" animation.
 
 ## Install
 
-- [Claude Code](#install-for-claude-code)
-- [Codex](#install-for-codex)
-- [Other agents](#other-agents)
+One command, any agent ([Claude Code](https://claude.com/claude-code),
+[Codex](https://github.com/openai/codex), Cursor, OpenCode, …) — via
+[skills.sh](https://skills.sh):
 
-The widgio skill ships an auto-bootstrap line — the first time the agent
-runs a widgio command, it'll `npm install -g widgio` itself if the binary
-isn't on `$PATH`. So you only need to install the **skill** below; the CLI
-takes care of itself.
+```bash
+npx skills add jnsahaj/widgio -g
+```
+
+That drops the skill into your agent's skills directory
+(`~/.claude/skills/widgio/`, `~/.codex/skills/widgio/`, etc.). Add `-a
+claude-code` (or `-a codex`) to scope to a single agent if you have more
+than one installed.
+
+The skill ships an auto-bootstrap line — the first time the agent runs a
+widgio command, it'll `npm install -g widgio` itself if the binary isn't on
+`$PATH`. So `npx skills add` is all you need; the CLI takes care of itself.
 
 If you'd rather pre-install the binary:
 
@@ -35,69 +43,24 @@ If you'd rather pre-install the binary:
 npm i -g widgio          # or: pnpm add -g widgio / yarn global add widgio / bun add -g widgio
 ```
 
-### Install for Claude Code
+Restart your agent after install — the skill loads on next session.
 
-Inside Claude Code, run these as **two separate commands** — paste the
-first, hit return, wait for it to finish, then paste the second. (If you
-paste both at once, Claude Code reads the second line as part of the
-marketplace name and the clone fails.)
+### Manual install (no `npx`)
 
-**Step 1** — register the marketplace:
-
-```text
-/plugin marketplace add jnsahaj/widgio
-```
-
-**Step 2** — install the plugin:
-
-```text
-/plugin install widgio@widgio
-```
-
-Restart Claude Code after install. The skill is loaded automatically the
-next time the agent decides a visual would help.
-
-To install from a local checkout instead:
-
-```text
-/plugin install /absolute/path/to/widgio/plugin
-```
-
-### Install for Codex
-
-Drop the skill into Codex's skills directory:
+Drop [`skills/widgio/SKILL.md`](skills/widgio/SKILL.md) (plain markdown, no
+agent-specific syntax) into wherever your agent reads skills:
 
 ```bash
-curl -fsSL https://codeload.github.com/jnsahaj/widgio/tar.gz/main | tar xz -C /tmp \
-  && mkdir -p ~/.codex/skills \
-  && rm -rf ~/.codex/skills/widgio \
-  && mv /tmp/widgio-main/plugin/skills/widgio ~/.codex/skills/widgio \
-  && rm -rf /tmp/widgio-main
+# Claude Code
+git clone https://github.com/jnsahaj/widgio /tmp/widgio \
+  && rm -rf ~/.claude/skills/widgio \
+  && mv /tmp/widgio/skills/widgio ~/.claude/skills/widgio \
+  && rm -rf /tmp/widgio
+
+# Codex — same command, swap ~/.claude for ~/.codex
 ```
 
-The command is **idempotent** — re-run it any time to update to the latest
-skill. Restart Codex (or open a new session) to pick up changes. Verify:
-
-```bash
-ls ~/.codex/skills/widgio/SKILL.md
-```
-
-Or, if you prefer Codex's built-in `skill-installer`, ask Codex from inside
-the TUI:
-
-```text
-install the widgio skill from github.com/jnsahaj/widgio (path plugin/skills/widgio)
-```
-
-For a per-repo install (skill scoped to current project only), replace
-`~/.codex/skills` with `./.codex/skills` in the curl command above.
-
-### Other agents
-
-The CLI is the universal interface — any agent that can run shell commands
-can use widgio. Drop `plugin/skills/widgio/SKILL.md` (plain markdown, no
-Claude- or OpenAI-specific syntax) wherever your agent reads skills, and
-make sure `widgio` is on `$PATH` (or let the skill self-bootstrap).
+Make sure `widgio` is on `$PATH` (or let the skill self-bootstrap).
 
 ---
 
@@ -115,40 +78,15 @@ widgio --version                 # confirm the new version
 widgio stop                      # so the next call spawns a fresh daemon
 ```
 
-### Update the skill (Claude Code)
+### Update the skill
 
-Inside Claude Code, three commands — run each separately, one paste at a
-time:
-
-```text
-/plugin marketplace update widgio
-```
-
-```text
-/plugin uninstall widgio@widgio
-```
-
-```text
-/plugin install widgio@widgio
-```
-
-Claude Code doesn't currently document a single `/plugin update` command,
-so uninstall + reinstall after refreshing the marketplace cache is the
-canonical path.
-
-### Update the skill (Codex)
-
-Re-run the install one-liner — it's idempotent:
+Re-run the install — `npx skills add` is idempotent and pulls the latest:
 
 ```bash
-curl -fsSL https://codeload.github.com/jnsahaj/widgio/tar.gz/main | tar xz -C /tmp \
-  && mkdir -p ~/.codex/skills \
-  && rm -rf ~/.codex/skills/widgio \
-  && mv /tmp/widgio-main/plugin/skills/widgio ~/.codex/skills/widgio \
-  && rm -rf /tmp/widgio-main
+npx skills add jnsahaj/widgio -g
 ```
 
-Restart Codex (or open a new session) afterwards.
+Restart your agent (or open a new session) afterwards.
 
 ---
 
