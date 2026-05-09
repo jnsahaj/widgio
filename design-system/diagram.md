@@ -7,13 +7,15 @@ For SVG diagrams: flowcharts, structural diagrams, illustrative diagrams.
 
 Three failures account for most ugly diagrams. Each individually breaks rules below; together they produce a slapdash output. Check each before drawing.
 
-### 1. Two concepts crammed into one diagram
+### 1. Multiple concepts melted into one diagram
 
-The user asks *"how does X work"*, you reach for ONE diagram, and end up with an overview pipeline jammed against a zoomed-in mechanism. The eye gives up.
+The user asks *"how does X work"*, you reach for one diagram, and end up with an overview pipeline jammed against a zoomed-in mechanism — no separators, no section titles, arrows from one concept landing in the middle of another. The eye gives up.
 
-**Fix:** Default to MULTIPLE widgets for "how does X work" prompts. Each widget makes ONE point. Write prose between them in your normal response text to connect the points. A tight 1-concept diagram beats a dense 3-concept one. Promise three; deliver three.
+The fault is composition, not count. A single widget *can* cover pipeline + mechanism + sampling — but each concept needs its own visually distinct, clearly bounded section. See SKILL.md → "Three patterns for a multi-concept widget" for the structural options (stacked sections, interactive stepper, sub-framed SVG).
 
-A symptom: if you can't name what the diagram makes obvious in ≤5 words, you're trying to do too much. Split.
+**Fix:** if a widget covers multiple concepts, frame them. Each concept goes inside its own region with a hairline border or background tint, a short section heading at the top, and a number ((1), (2), (3)) if they're sequential. Arrows stay inside their section unless the cross-section flow IS the point. Same-tier siblings inside a section share one color.
+
+A symptom that you've under-structured: if you can't trace each concept's boundary by following a stroke around it, the sections aren't framed enough.
 
 ### 2. Rainbow top row of unrelated colors
 
@@ -65,15 +67,15 @@ The decision is about *intent*. Ask: is the user trying to *document* this, or *
 
 The illustrative route is the default for *"how does X work"* with no further qualification. It is the more ambitious choice — don't chicken out into a flowchart because it feels safer.
 
-Don't mix families in one diagram. If you need both, draw the intuition version first (build the mental model), then the reference version (fill in the precise labels) as a second widget with prose between.
+Don't mix families in one diagram. If you need both an intuition view and a reference view, pick the one that's more load-bearing for the user's question and put the other in prose.
 
-## Always add prose between diagrams
+## One widget per response
 
-For complex topics, use **multiple widgio calls** — break the explanation into a series of smaller diagrams rather than one dense diagram. Each diagram streams in with its own animation and card, creating a visual narrative the user can follow step by step.
+widgio renders one widget per sidebar entry — multiple widgets for one explanation fragment the narrative across entries and clutter the UI. So: at most one widget per agent response.
 
-Never stack multiple diagrams back-to-back without text. Between each, write a short paragraph (in your normal response text, outside the widget call) that explains what the next diagram shows and connects it to the previous one.
+That widget can cover multiple concepts. Use the structural patterns in SKILL.md → "Three patterns for a multi-concept widget" (stacked sections, interactive stepper, sub-framed SVG). What matters is that each concept inside the widget is visually framed and clearly delineated — not that there's only one concept.
 
-**Promise only what you deliver.** If your response says "here are three diagrams", deliver all three. One complete diagram is better than three promised and one delivered.
+**Promise only what you deliver.** If your text references a section in the widget, make sure that section is actually there.
 
 ## Two rules that cause most diagram failures
 
@@ -196,7 +198,7 @@ For concepts where physical or logical containment matters — things inside oth
 - Place inner regions side by side within the container, with 16px+ gap between them.
 - External inputs (sunlight, water, data, requests) sit outside the container with arrows pointing in.
 - External outputs sit outside with arrows pointing out.
-- Keep external labels short — one word or a short phrase. Details go in prose between diagrams.
+- Keep external labels short — one word or a short phrase. Details go in your response text alongside the widget.
 
 **What goes inside regions.** Text only — region name (`th` 14px medium) and a short description (`ts` 12px). Don't put flowchart-style boxes inside regions. Don't draw illustrations or icons inside.
 
