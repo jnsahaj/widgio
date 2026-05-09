@@ -8,6 +8,28 @@ description: Render animated SVG/HTML widgets inline in a browser companion. Use
 widgio renders SVG and HTML widgets in a browser tab. The agent calls a CLI;
 the widgets stream into a browser companion at `http://127.0.0.1:4242`.
 
+## Before first use — make sure widgio is installed
+
+Run this as your first widgio shell command in any new session:
+
+```bash
+command -v widgio || npm install -g widgio
+```
+
+That's a no-op if `widgio` is already on `$PATH`, and a one-time global
+install otherwise (~3 seconds). The widgio Claude Code / Codex plugin
+ships only the skill — it can't install the binary for the user, so this
+check belongs in your flow.
+
+**If the install fails** (permission denied, registry unreachable, etc.):
+tell the user, suggest `sudo npm install -g widgio` *only if it's a
+permissions error*, and stop. Don't retry blindly. If the user prefers a
+different package manager, they can run `pnpm add -g widgio`,
+`yarn global add widgio`, or `bun add -g widgio` — but you don't need to
+guess; npm is always available with Node.
+
+After the binary is in place, the rest of this skill applies.
+
 ## When to use
 
 Use widgio when a visual would clarify an explanation:

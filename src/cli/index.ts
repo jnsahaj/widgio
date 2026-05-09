@@ -1,5 +1,4 @@
 import { chunk, end, openBrowser, readMe, show, start, status, stop } from "./commands.ts";
-import { setup } from "./setup.ts";
 import type { WidgetMode } from "../shared/types.ts";
 
 const HELP = `widgio — stream widgets to a browser companion
@@ -17,9 +16,6 @@ usage:
   widgio open                              # open browser to feed
   widgio status                            # show daemon status
   widgio stop                              # stop the daemon
-  widgio setup [--claude] [--codex] [--skill-only] [--repo]
-              [--install | --no-install]
-                                          # install widgio globally + plugin/skill
 
 examples (one-shot):
   widgio show --title oauth_flow <<'EOF'
@@ -79,11 +75,6 @@ async function main() {
     case "read-me": {
       const modules = parseFlagArray(rest, "--module");
       process.stdout.write(await readMe(modules));
-      return;
-    }
-    case "setup": {
-      const args = parseSetupArgs(rest);
-      await setup(args);
       return;
     }
     case "open":
@@ -162,38 +153,6 @@ function parseEndArgs(argv: string[]) {
     else throw new Error(`unknown flag: ${a}`);
   }
   return { id };
-}
-
-function parseSetupArgs(argv: string[]): {
-  claude?: boolean;
-  codex?: boolean;
-  codexMode?: "plugin" | "skill";
-  scope?: "user" | "repo";
-  globalInstall?: boolean;
-} {
-  let claude: boolean | undefined;
-  let codex: boolean | undefined;
-  let codexMode: "plugin" | "skill" | undefined;
-  let scope: "user" | "repo" | undefined;
-  let globalInstall: boolean | undefined;
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a === "--claude") claude = true;
-    else if (a === "--no-claude") claude = false;
-    else if (a === "--codex") codex = true;
-    else if (a === "--no-codex") codex = false;
-    else if (a === "--all") {
-      claude = true;
-      codex = true;
-    } else if (a === "--skill-only") codexMode = "skill";
-    else if (a === "--plugin") codexMode = "plugin";
-    else if (a === "--repo") scope = "repo";
-    else if (a === "--user") scope = "user";
-    else if (a === "--install") globalInstall = true;
-    else if (a === "--no-install") globalInstall = false;
-    else throw new Error(`unknown flag: ${a}`);
-  }
-  return { claude, codex, codexMode, scope, globalInstall };
 }
 
 function parseFlagArray(argv: string[], flag: string): string[] {
