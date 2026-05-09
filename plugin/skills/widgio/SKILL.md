@@ -118,10 +118,15 @@ Flags:
 
 ### Step 2 — emit semantic chunks, one per logical group
 
-Each `widgio chunk` call appends one or more **complete top-level elements** with a `--label` describing what's being added. The label appears under the title as the chunk lands.
+Each `widgio chunk` call appends one or more **complete top-level elements**. The chunk's content is what just got drawn; the chunk's `--label` is *forward-looking* — it describes what you're working on **next**, after sending this chunk. The widget UI displays the label as a live caption so the user sees what's happening behind the scenes while they look at the chunk that just landed.
+
+**Phrase labels in present-continuous form** ("drawing actor nodes", "wiring up the edges", "highlighting the focal node"). Don't restate what's *in* this chunk — that's already on screen. Describe what's coming.
+
+For the **last chunk** before `widgio end`, omit `--label` (or pass `--label "finishing up"`). The caption clears on `end` regardless.
 
 ```bash
-widgio chunk --label "skeleton + columns" <<'EOF'
+# chunk 1 contains the skeleton; the label says what comes next
+widgio chunk --label "drawing actor nodes" <<'EOF'
 <g id="bg">
   <rect x="0" y="0" width="680" height="320" fill="var(--surface)" />
   <line x1="170" y1="40" x2="170" y2="280" stroke="var(--border)" />
@@ -129,7 +134,8 @@ widgio chunk --label "skeleton + columns" <<'EOF'
 </g>
 EOF
 
-widgio chunk --label "actor labels" <<'EOF'
+# chunk 2 contains the actors; label says what's next (edges)
+widgio chunk --label "wiring up request edges" <<'EOF'
 <g id="actors">
   <text x="85" y="30" text-anchor="middle" fill="var(--text)" font-size="13">User</text>
   <text x="340" y="30" text-anchor="middle" fill="var(--text)" font-size="13">App</text>
@@ -137,7 +143,8 @@ widgio chunk --label "actor labels" <<'EOF'
 </g>
 EOF
 
-widgio chunk --label "request edges" <<'EOF'
+# chunk 3 is the last — no label, or a closing one
+widgio chunk <<'EOF'
 <g id="edges">
   <path d="M 85 60 L 340 60" stroke="var(--accent)" stroke-width="1.5" fill="none" marker-end="url(#arrow)" />
   <text x="212" y="55" text-anchor="middle" fill="var(--text-muted)" font-size="11">click "log in"</text>

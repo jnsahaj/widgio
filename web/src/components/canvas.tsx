@@ -39,16 +39,16 @@ interface StreamState {
   liveCode: string;
 }
 
-// Static, honest while-streaming caption. We deliberately do NOT cycle chunk
-// labels here — labels describe what's *in* a chunk (already arrived), not
-// what the agent is currently working on. Showing them as the live status was
-// misleading. The progress bar above carries the "active" signal; this just
-// labels what kind of activity is happening.
-const STREAMING_CAPTION = "Drawing…";
+// Initial while-streaming caption, before any chunk has arrived. Chunks
+// update it via their forward-looking `--label` — the label on chunk N
+// describes what the agent is working on NEXT (i.e., chunk N+1 or whatever
+// comes after), so the user reads what's actually happening behind the
+// scenes while they look at chunk N.
+const INITIAL_STREAMING_CAPTION = "Drawing…";
 
 function ThreadView({ thread, initialStreaming }: ThreadViewProps) {
   const [stream, setStream] = useState<StreamState>(() => ({
-    caption: initialStreaming ? STREAMING_CAPTION : "",
+    caption: initialStreaming ? INITIAL_STREAMING_CAPTION : "",
     streaming: initialStreaming,
     liveCode: thread.code,
   }));
@@ -58,8 +58,9 @@ function ThreadView({ thread, initialStreaming }: ThreadViewProps) {
     if (event.id !== thread.id) return;
     switch (event.kind) {
       case "chunk":
-        // Chunk labels stay in CLI output (where they help the agent track
-        // its own progress) but don't surface in the UI. Caption stays put.
+        // Forward-looking: label N describes work happening AFTER chunk N.
+        // Display it as the live caption while the user views chunk N.
+        if (event.label) setStream((s) => ({ ...s, caption: event.label ?? s.caption }));
         frameRef.current?.applyChunk(event.code);
         setStream((s) => ({ ...s, liveCode: s.liveCode + event.code + "\n" }));
         break;
