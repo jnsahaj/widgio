@@ -14,9 +14,16 @@ const CLAUDE_INSTRUCTIONS = [
   "/plugin install widgio@widgio",
 ];
 
+const CODEX_PLUGIN_INSTRUCTIONS = [
+  "codex plugin marketplace add jnsahaj/widgio",
+];
+
+export type CodexMode = "plugin" | "skill";
+
 export interface SetupOpts {
   claude?: boolean;
   codex?: boolean;
+  codexMode?: CodexMode;
   yes?: boolean;
   scope?: "user" | "repo";
 }
@@ -32,7 +39,11 @@ export async function setup(opts: SetupOpts): Promise<void> {
   }
 
   if (codex) {
-    await installCodexSkill(opts.scope ?? "user");
+    if ((opts.codexMode ?? "plugin") === "skill") {
+      await installCodexSkill(opts.scope ?? "user");
+    } else {
+      printCodexInstructions();
+    }
   }
   if (claude) {
     printClaudeInstructions();
@@ -112,4 +123,12 @@ function printClaudeInstructions(): void {
   process.stdout.write("\nClaude Code: paste these inside Claude Code (interactive only):\n\n");
   for (const cmd of CLAUDE_INSTRUCTIONS) process.stdout.write(`  ${cmd}\n`);
   process.stdout.write("\n");
+}
+
+function printCodexInstructions(): void {
+  process.stdout.write("\nCodex: run this in your terminal to install the widgio plugin:\n\n");
+  for (const cmd of CODEX_PLUGIN_INSTRUCTIONS) process.stdout.write(`  ${cmd}\n`);
+  process.stdout.write(
+    "\n  (skill-only fallback: rerun with `widgio setup --codex --skill-only`)\n\n"
+  );
 }

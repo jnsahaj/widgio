@@ -78,10 +78,20 @@ To install from a local checkout instead:
 
 ### Codex CLI
 
-`widgio setup --codex` copies `SKILL.md` to `~/.agents/skills/widgio/`.
-Verify Codex picked it up:
+This repo is a Codex plugin marketplace too. `widgio setup --codex` prints:
 
 ```bash
+codex plugin marketplace add jnsahaj/widgio
+```
+
+Run it in your terminal — Codex installs the plugin (which bundles the
+skill) and picks it up on next launch.
+
+Skill-only fallback (no marketplace add, just drops `SKILL.md` into
+`~/.agents/skills/widgio/`):
+
+```bash
+widgio setup --codex --skill-only
 codex skills list | grep widgio
 ```
 

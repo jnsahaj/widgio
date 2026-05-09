@@ -17,7 +17,8 @@ usage:
   widgio open                              # open browser to feed
   widgio status                            # show daemon status
   widgio stop                              # stop the daemon
-  widgio setup [--claude] [--codex] [--repo]   # install skill into your agent
+  widgio setup [--claude] [--codex] [--skill-only] [--repo]
+                                          # install plugin/skill into your agent
 
 examples (one-shot):
   widgio show --title oauth_flow <<'EOF'
@@ -165,10 +166,12 @@ function parseEndArgs(argv: string[]) {
 function parseSetupArgs(argv: string[]): {
   claude?: boolean;
   codex?: boolean;
+  codexMode?: "plugin" | "skill";
   scope?: "user" | "repo";
 } {
   let claude: boolean | undefined;
   let codex: boolean | undefined;
+  let codexMode: "plugin" | "skill" | undefined;
   let scope: "user" | "repo" | undefined;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -179,11 +182,13 @@ function parseSetupArgs(argv: string[]): {
     else if (a === "--all") {
       claude = true;
       codex = true;
-    } else if (a === "--repo") scope = "repo";
+    } else if (a === "--skill-only") codexMode = "skill";
+    else if (a === "--plugin") codexMode = "plugin";
+    else if (a === "--repo") scope = "repo";
     else if (a === "--user") scope = "user";
     else throw new Error(`unknown flag: ${a}`);
   }
-  return { claude, codex, scope };
+  return { claude, codex, codexMode, scope };
 }
 
 function parseFlagArray(argv: string[], flag: string): string[] {
