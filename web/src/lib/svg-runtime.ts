@@ -129,6 +129,38 @@ export function injectSvgRuntime(svgEl: SVGSVGElement) {
   svgEl.insertBefore(style, svgEl.firstChild);
 }
 
+/**
+ * Inline script that runs INSIDE every widget iframe. The sandbox blocks the
+ * parent from reading `iframe.contentDocument`, so the iframe has to report
+ * its own size via postMessage. ResizeObserver + MutationObserver catch
+ * size changes from JS (chart libraries, dynamic content, etc.).
+ */
+const IFRAME_RUNTIME_SCRIPT = `
+  window.sendPrompt = (t) => parent.postMessage({type:"sendPrompt",text:t}, "*");
+  window.openLink = (u) => parent.postMessage({type:"openLink",url:u}, "*");
+  (function() {
+    var lastH = -1;
+    var report = function() {
+      var h = Math.max(
+        document.body ? document.body.scrollHeight : 0,
+        document.documentElement ? document.documentElement.scrollHeight : 0
+      );
+      if (h === lastH) return;
+      lastH = h;
+      parent.postMessage({type:"widgio-size", height:h}, "*");
+    };
+    var start = function() {
+      report();
+      try {
+        new ResizeObserver(report).observe(document.body);
+        new MutationObserver(report).observe(document.body, {childList:true, subtree:true, attributes:true});
+      } catch (e) {}
+      window.addEventListener("load", report);
+    };
+    if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
+  })();
+`;
+
 export function streamingShellHtml(): string {
   return `<!doctype html><html><head>
 ${IFRAME_HEAD_LINKS}
@@ -138,20 +170,19 @@ ${IFRAME_HEAD_LINKS}
 </style></head><body>
 <div id="root"></div>
 <script>
-  window.sendPrompt = (t) => parent.postMessage({type:"sendPrompt",text:t}, "*");
-  window.openLink = (u) => parent.postMessage({type:"openLink",url:u}, "*");
-  window.addEventListener("message", (e) => {
-    const d = e.data;
-    if (d && d.type === "widgio-chunk" && typeof d.html === "string") {
-      const root = document.getElementById("root");
-      const tmp = document.createElement("div");
-      tmp.innerHTML = d.html;
-      for (const node of [...tmp.childNodes]) {
-        if (node.nodeType === 1) node.classList.add("widgio-chunk");
-        root.appendChild(node);
-      }
+${IFRAME_RUNTIME_SCRIPT}
+window.addEventListener("message", (e) => {
+  const d = e.data;
+  if (d && d.type === "widgio-chunk" && typeof d.html === "string") {
+    const root = document.getElementById("root");
+    const tmp = document.createElement("div");
+    tmp.innerHTML = d.html;
+    for (const node of [...tmp.childNodes]) {
+      if (node.nodeType === 1) node.classList.add("widgio-chunk");
+      root.appendChild(node);
     }
-  });
+  }
+});
 <\/script>
 </body></html>`;
 }
@@ -161,27 +192,23 @@ export function wrapCompleteHtml(code: string): string {
 ${IFRAME_HEAD_LINKS}
 <style>${IFRAME_TOKEN_CSS}</style></head><body>${code}
 <script>
-  window.sendPrompt = (t) => parent.postMessage({type:"sendPrompt",text:t}, "*");
-  window.openLink = (u) => parent.postMessage({type:"openLink",url:u}, "*");
+${IFRAME_RUNTIME_SCRIPT}
 <\/script></body></html>`;
 }
 
-export function autoSizeIframe(iframe: HTMLIFrameElement) {
-  iframe.addEventListener("load", () => {
-    try {
-      const doc = iframe.contentDocument;
-      if (!doc) return;
-      const resize = () => {
-        const h = Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
-        iframe.style.height = `${h}px`;
-      };
-      resize();
-      const ro = new ResizeObserver(resize);
-      ro.observe(doc.body);
-      const mo = new MutationObserver(resize);
-      mo.observe(doc.body, { childList: true, subtree: true, attributes: true });
-    } catch {
-      // cross-origin
+/**
+ * Listen for height reports from the iframe (since sandboxed iframes block
+ * cross-frame DOM access, the iframe has to tell us how tall it wants to be).
+ * Returns a cleanup function that removes the listener.
+ */
+export function autoSizeIframe(iframe: HTMLIFrameElement): () => void {
+  const onMessage = (e: MessageEvent) => {
+    if (e.source !== iframe.contentWindow) return;
+    const data = e.data;
+    if (data && data.type === "widgio-size" && typeof data.height === "number") {
+      iframe.style.height = `${Math.max(data.height, 1)}px`;
     }
-  });
+  };
+  window.addEventListener("message", onMessage);
+  return () => window.removeEventListener("message", onMessage);
 }

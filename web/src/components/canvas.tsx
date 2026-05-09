@@ -39,9 +39,16 @@ interface StreamState {
   liveCode: string;
 }
 
+// Static, honest while-streaming caption. We deliberately do NOT cycle chunk
+// labels here — labels describe what's *in* a chunk (already arrived), not
+// what the agent is currently working on. Showing them as the live status was
+// misleading. The progress bar above carries the "active" signal; this just
+// labels what kind of activity is happening.
+const STREAMING_CAPTION = "Drawing…";
+
 function ThreadView({ thread, initialStreaming }: ThreadViewProps) {
   const [stream, setStream] = useState<StreamState>(() => ({
-    caption: initialStreaming ? "building" : "",
+    caption: initialStreaming ? STREAMING_CAPTION : "",
     streaming: initialStreaming,
     liveCode: thread.code,
   }));
@@ -51,7 +58,8 @@ function ThreadView({ thread, initialStreaming }: ThreadViewProps) {
     if (event.id !== thread.id) return;
     switch (event.kind) {
       case "chunk":
-        if (event.label) setStream((s) => ({ ...s, caption: event.label ?? s.caption }));
+        // Chunk labels stay in CLI output (where they help the agent track
+        // its own progress) but don't surface in the UI. Caption stays put.
         frameRef.current?.applyChunk(event.code);
         setStream((s) => ({ ...s, liveCode: s.liveCode + event.code + "\n" }));
         break;
@@ -59,7 +67,6 @@ function ThreadView({ thread, initialStreaming }: ThreadViewProps) {
         setStream((s) => ({ ...s, caption: "", streaming: false }));
         break;
       case "complete":
-        // a one-shot replaced this thread mid-flight: render the final code
         setStream({ caption: "", streaming: false, liveCode: event.code });
         break;
     }

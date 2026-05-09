@@ -33,6 +33,7 @@ export const WidgetFrame = forwardRef<WidgetFrameHandle, Props>(({ init }, ref) 
     svgRef.current = null;
     iframeRef.current = null;
     iframeReadyRef.current = null;
+    let cleanupAutoSize: (() => void) | undefined;
 
     if (init.kind === "static") {
       if (init.mode === "svg") {
@@ -40,6 +41,7 @@ export const WidgetFrame = forwardRef<WidgetFrameHandle, Props>(({ init }, ref) 
         wrap.innerHTML = init.code;
         const svg = wrap.querySelector("svg");
         if (svg) {
+          ensureSvgFluidWidth(svg as SVGSVGElement);
           injectSvgRuntime(svg as SVGSVGElement);
           host.appendChild(svg);
           svgRef.current = svg as SVGSVGElement;
@@ -47,12 +49,10 @@ export const WidgetFrame = forwardRef<WidgetFrameHandle, Props>(({ init }, ref) 
           host.appendChild(wrap);
         }
       } else {
-        const iframe = document.createElement("iframe");
-        iframe.setAttribute("sandbox", "allow-scripts allow-pointer-lock allow-popups");
-        iframe.srcdoc = wrapCompleteHtml(init.code);
+        const iframe = createIframe(wrapCompleteHtml(init.code));
+        cleanupAutoSize = autoSizeIframe(iframe);
         host.appendChild(iframe);
         iframeRef.current = iframe;
-        autoSizeIframe(iframe);
       }
     } else {
       if (init.mode === "svg") {
@@ -62,6 +62,7 @@ export const WidgetFrame = forwardRef<WidgetFrameHandle, Props>(({ init }, ref) 
         );
         for (const [k, v] of Object.entries(attrs)) svg.setAttribute(k, v);
         if (!svg.getAttribute("xmlns")) svg.setAttribute("xmlns", SVG_NS);
+        ensureSvgFluidWidth(svg);
         injectSvgRuntime(svg);
         const animStyle = document.createElementNS(SVG_NS, "style");
         animStyle.textContent = `
@@ -72,17 +73,20 @@ export const WidgetFrame = forwardRef<WidgetFrameHandle, Props>(({ init }, ref) 
         host.appendChild(svg);
         svgRef.current = svg;
       } else {
-        const iframe = document.createElement("iframe");
-        iframe.setAttribute("sandbox", "allow-scripts allow-pointer-lock allow-popups");
-        iframe.srcdoc = streamingShellHtml();
-        host.appendChild(iframe);
-        iframeRef.current = iframe;
+        const iframe = createIframe(streamingShellHtml());
+        // Wire handlers BEFORE appending — once the iframe is in the DOM,
+        // srcdoc fires `load` immediately and a later listener misses.
         iframeReadyRef.current = new Promise<void>((res) => {
           iframe.addEventListener("load", () => res(), { once: true });
         });
-        autoSizeIframe(iframe);
+        cleanupAutoSize = autoSizeIframe(iframe);
+        host.appendChild(iframe);
+        iframeRef.current = iframe;
       }
     }
+    return () => {
+      cleanupAutoSize?.();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -97,6 +101,45 @@ export const WidgetFrame = forwardRef<WidgetFrameHandle, Props>(({ init }, ref) 
   return <div ref={hostRef} className="widgio-host w-full" />;
 });
 WidgetFrame.displayName = "WidgetFrame";
+
+/**
+ * Iframes default to 300×150 if no width/height is set — that's the HTML
+ * spec for replaced elements. Without an explicit `width: 100%` the host's
+ * widget area shrinks to that default and any content wider than ~300px
+ * triggers internal scrollbars. autoSizeIframe handles height; this
+ * handles width.
+ *
+ * Background is forced transparent because the iframe element itself paints
+ * an opaque white background by default (independent of the body's
+ * `background: transparent`), which clashes with widgio's dark canvas.
+ * `colorScheme: dark` keeps form controls inside the iframe themed for the
+ * dark UI without bleeding the iframe's white-paper default through.
+ *
+ * We attach the load handler here before the caller appends the iframe to
+ * the DOM — once it's connected, srcdoc fires `load` immediately, and a
+ * later-attached listener misses the event (leaving height stuck at 150).
+ */
+function createIframe(srcdoc: string): HTMLIFrameElement {
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute("sandbox", "allow-scripts allow-pointer-lock allow-popups");
+  iframe.style.width = "100%";
+  iframe.style.border = "0";
+  iframe.style.display = "block";
+  iframe.style.backgroundColor = "transparent";
+  iframe.style.colorScheme = "dark";
+  iframe.srcdoc = srcdoc;
+  return iframe;
+}
+
+/**
+ * Default SVGs to fluid width when the agent omitted the `width="100%"`
+ * design rule. Without an explicit width, browsers render SVG at viewBox
+ * dimensions or a 300×150 fallback, so omitting it produces clipped or
+ * mis-sized widgets.
+ */
+function ensureSvgFluidWidth(svg: SVGSVGElement) {
+  if (!svg.hasAttribute("width")) svg.setAttribute("width", "100%");
+}
 
 function parseAttrs(s: string): Record<string, string> {
   const out: Record<string, string> = {};
