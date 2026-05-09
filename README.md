@@ -60,11 +60,13 @@ Drop the skill into Codex's skills directory:
 ```bash
 curl -fsSL https://codeload.github.com/jnsahaj/widgio/tar.gz/main | tar xz -C /tmp \
   && mkdir -p ~/.codex/skills \
+  && rm -rf ~/.codex/skills/widgio \
   && mv /tmp/widgio-main/plugin/skills/widgio ~/.codex/skills/widgio \
   && rm -rf /tmp/widgio-main
 ```
 
-Restart Codex (or open a new session) to pick it up. Verify:
+The command is **idempotent** — re-run it any time to update to the latest
+skill. Restart Codex (or open a new session) to pick up changes. Verify:
 
 ```bash
 ls ~/.codex/skills/widgio/SKILL.md
@@ -86,6 +88,50 @@ The CLI is the universal interface — any agent that can run shell commands
 can use widgio. Drop `plugin/skills/widgio/SKILL.md` (plain markdown, no
 Claude- or OpenAI-specific syntax) wherever your agent reads skills, and
 make sure `widgio` is on `$PATH` (or let the skill self-bootstrap).
+
+---
+
+## Updating
+
+Three things move independently: the **CLI**, the **skill**, and the
+**daemon** (which is just a process the CLI auto-spawns — restart it after
+a CLI update with `widgio stop`).
+
+### Update the CLI
+
+```bash
+npm i -g widgio                  # or: pnpm add -g widgio / yarn global add widgio / bun add -g widgio
+widgio --version                 # confirm the new version
+widgio stop                      # so the next call spawns a fresh daemon
+```
+
+### Update the skill (Claude Code)
+
+Inside Claude Code:
+
+```text
+/plugin marketplace update widgio
+/plugin uninstall widgio@widgio
+/plugin install widgio@widgio
+```
+
+Claude Code doesn't currently document a single `/plugin update` command,
+so uninstall + reinstall after refreshing the marketplace cache is the
+canonical path.
+
+### Update the skill (Codex)
+
+Re-run the install one-liner — it's idempotent:
+
+```bash
+curl -fsSL https://codeload.github.com/jnsahaj/widgio/tar.gz/main | tar xz -C /tmp \
+  && mkdir -p ~/.codex/skills \
+  && rm -rf ~/.codex/skills/widgio \
+  && mv /tmp/widgio-main/plugin/skills/widgio ~/.codex/skills/widgio \
+  && rm -rf /tmp/widgio-main
+```
+
+Restart Codex (or open a new session) afterwards.
 
 ---
 
@@ -131,6 +177,7 @@ Other commands:
 widgio read-me --module diagram   # design system reference for the agent
 widgio status                     # daemon status
 widgio stop                       # kill the daemon
+widgio --version                  # print version (also: -v)
 ```
 
 ---

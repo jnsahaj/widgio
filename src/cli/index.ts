@@ -1,7 +1,10 @@
 import { chunk, end, openBrowser, readMe, show, start, status, stop } from "./commands.ts";
 import type { WidgetMode } from "../shared/types.ts";
+import pkg from "../../package.json" with { type: "json" };
 
-const HELP = `widgio — stream widgets to a browser companion
+const VERSION = pkg.version;
+
+const HELP = `widgio v${VERSION} — stream widgets to a browser companion
 
 usage:
   widgio show --title <name> [--loading <msg>]... [--mode auto|svg|html] [--open]
@@ -43,6 +46,11 @@ examples (streaming, semantic chunks):
 
 async function main() {
   const [, , cmd, ...rest] = process.argv;
+
+  if (cmd === "--version" || cmd === "-v" || cmd === "version") {
+    process.stdout.write(`${VERSION}\n`);
+    return;
+  }
 
   if (!cmd || cmd === "help" || cmd === "--help" || cmd === "-h") {
     process.stdout.write(HELP);
