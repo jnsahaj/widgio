@@ -199,50 +199,6 @@ widgio --version                  # print version (also: -v)
 
 ---
 
-## How it works
-
-- **CLI** (Node, npm-distributed) — auto-spawns a detached **daemon** on
-  first call. Idle-shuts after 30 minutes of no activity.
-- **Daemon** — small Hono server on `127.0.0.1:4242` (falls back if taken).
-  Persists each widget as `~/.widgio/threads/<id>.json` (plain JSON, `v: 1`
-  schema). Serves the web UI alongside the API.
-- **Web UI** — Vite + React + Tailwind. Sidebar of past widgets grouped by
-  date, archive support, deep-linkable per-widget routes (`/t/<id>`).
-- **Agent integration** — a single `SKILL.md` shipped to both Claude Code
-  (as a plugin) and Codex (as a skill). The skill self-bootstraps the
-  `widgio` CLI on first use.
-
----
-
-## Development
-
-```bash
-git clone git@github.com:jnsahaj/widgio.git && cd widgio
-pnpm install
-pnpm build              # esbuild for CLI, vite for web → dist/
-pnpm typecheck
-pnpm dev:web            # Vite dev server, proxies to a running daemon
-```
-
-Local install (for hacking — symlink the dev build onto `$PATH`):
-
-```bash
-chmod +x dist/cli.js
-ln -s "$(pwd)/dist/cli.js" /usr/local/bin/widgio
-```
-
-Repo layout:
-
-```text
-src/cli/                CLI entrypoint, commands, daemon spawn
-src/server/             Hono daemon (HTTP + SSE + thread store)
-web/                    Vite + React + Tailwind UI
-plugin/                 Claude Code + Codex plugin (skill source)
-design-system/          Agent-facing design rules (loaded by `widgio read-me`)
-```
-
----
-
 ## License
 
 MIT — see [LICENSE](./LICENSE).
