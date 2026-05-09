@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { cp, mkdir, rm } from "node:fs/promises";
 import { homedir } from "node:os";
@@ -26,10 +27,14 @@ export interface SetupOpts {
   codexMode?: CodexMode;
   yes?: boolean;
   scope?: "user" | "repo";
+  /** Force / skip the global-install prompt. Default: prompt. */
+  globalInstall?: boolean;
 }
 
 export async function setup(opts: SetupOpts): Promise<void> {
   const detected = detectAgents();
+
+  await ensureCliOnPath(opts.globalInstall);
 
   let { claude, codex } = opts;
   if (claude === undefined && codex === undefined) {
@@ -50,6 +55,75 @@ export async function setup(opts: SetupOpts): Promise<void> {
   }
   if (!claude && !codex) {
     process.stdout.write("widgio setup: nothing selected. re-run with --claude, --codex, or interactively.\n");
+  }
+}
+
+type Pm = "npm" | "pnpm" | "yarn" | "bun";
+
+function detectPm(): Pm {
+  const ua = process.env.npm_config_user_agent ?? "";
+  if (ua.startsWith("pnpm")) return "pnpm";
+  if (ua.startsWith("yarn")) return "yarn";
+  if (ua.startsWith("bun")) return "bun";
+  return "npm";
+}
+
+function pmInstallCmd(pm: Pm): { cmd: string; args: string[] } {
+  switch (pm) {
+    case "pnpm": return { cmd: "pnpm", args: ["add", "-g", "widgio"] };
+    case "yarn": return { cmd: "yarn", args: ["global", "add", "widgio"] };
+    case "bun": return { cmd: "bun", args: ["add", "-g", "widgio"] };
+    case "npm": return { cmd: "npm", args: ["install", "-g", "widgio"] };
+  }
+}
+
+/**
+ * Make sure a globally-installed `widgio` exists on $PATH. The caller might be
+ * running us via `npx widgio setup` (which puts us in npm's cache, not on
+ * $PATH), but agents shell out to `widgio` directly — so without a real global
+ * install, every agent call would re-fetch via npx.
+ */
+async function ensureCliOnPath(force?: boolean): Promise<void> {
+  if (hasOnPath("widgio")) return;
+
+  const pm = detectPm();
+  const { cmd, args } = pmInstallCmd(pm);
+
+  let go = force;
+  if (go === undefined) {
+    const rl = createInterface({ input: stdin, output: stdout });
+    try {
+      process.stdout.write("\nwidgio is not on your $PATH globally.\n");
+      process.stdout.write(
+        "agents shell out to `widgio` directly — without a global install,\n"
+      );
+      process.stdout.write("they'd have to go through npx every call (slow).\n\n");
+      go = await yesNo(rl, `install globally with \`${cmd} ${args.join(" ")}\`?`, true);
+    } finally {
+      rl.close();
+    }
+  }
+
+  if (!go) {
+    process.stdout.write(`skipped. install later with: ${cmd} ${args.join(" ")}\n\n`);
+    return;
+  }
+
+  process.stdout.write(`\n→ ${cmd} ${args.join(" ")}\n`);
+  const result = spawnSync(cmd, args, { stdio: "inherit" });
+  if (result.status !== 0) {
+    process.stdout.write(
+      `\n⚠ \`${cmd} ${args.join(" ")}\` failed (exit ${result.status ?? "?"}).\n`
+    );
+    process.stdout.write("  agents won't find widgio until this is resolved.\n\n");
+    return;
+  }
+  if (hasOnPath("widgio")) {
+    process.stdout.write("✓ widgio installed globally\n\n");
+  } else {
+    process.stdout.write(
+      "⚠ install completed but widgio still not on $PATH — check your shell's PATH for the global bin dir.\n\n"
+    );
   }
 }
 

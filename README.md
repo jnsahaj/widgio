@@ -13,8 +13,8 @@ MVP. SVG and HTML modes work. `sendPrompt` round-trip is stubbed for v2.
 
 ## Quick start
 
-One command — installs the CLI and walks you through wiring it up to your
-agent (Claude Code and/or Codex):
+One command — installs the CLI globally and walks you through wiring it up
+to your agent:
 
 ```bash
 npx widgio setup
@@ -22,22 +22,30 @@ npx widgio setup
 
 That command:
 
-1. Detects which agents are on your `$PATH`.
-2. Asks which to install for.
-3. For Codex, copies the skill to `~/.agents/skills/widgio/`.
-4. For Claude Code, prints the two `/plugin` commands to paste inside Claude.
+1. **Installs `widgio` globally** if it's not on your `$PATH` yet (asks
+   first; uses whichever package manager invoked `npx` — npm/pnpm/yarn/bun).
+   This matters: agents shell out to `widgio` directly, and going through
+   `npx` every call is slow.
+2. Detects which agents are on your `$PATH`.
+3. For Claude Code: prints the `/plugin marketplace add` lines to paste.
+4. For Codex: prints the `codex plugin marketplace add` line to run, or
+   (with `--skill-only`) drops the skill into `~/.agents/skills/widgio/`.
 
-Or non-interactive flags:
+Non-interactive flags:
 
 ```bash
-npx widgio setup --all              # both agents
-npx widgio setup --codex            # Codex only
-npx widgio setup --claude           # Claude commands only
-npx widgio setup --codex --repo     # Codex skill in ./.agents (this repo only)
+npx widgio setup --all                 # both agents, prompts for global install
+npx widgio setup --all --install       # both agents, skip the install prompt
+npx widgio setup --codex --skill-only  # Codex skill-only, no marketplace
+npx widgio setup --no-install          # skip global install, just print agent steps
 ```
 
-The `widgio` CLI itself is the npx entrypoint, so you also get every other
-command (`widgio show`, `widgio open`, etc.) without a global install.
+If you'd rather install widgio explicitly first:
+
+```bash
+npm i -g widgio    # or: pnpm add -g widgio / yarn global add widgio / bun add -g widgio
+widgio setup
+```
 
 ## Use it
 

@@ -18,7 +18,8 @@ usage:
   widgio status                            # show daemon status
   widgio stop                              # stop the daemon
   widgio setup [--claude] [--codex] [--skill-only] [--repo]
-                                          # install plugin/skill into your agent
+              [--install | --no-install]
+                                          # install widgio globally + plugin/skill
 
 examples (one-shot):
   widgio show --title oauth_flow <<'EOF'
@@ -168,11 +169,13 @@ function parseSetupArgs(argv: string[]): {
   codex?: boolean;
   codexMode?: "plugin" | "skill";
   scope?: "user" | "repo";
+  globalInstall?: boolean;
 } {
   let claude: boolean | undefined;
   let codex: boolean | undefined;
   let codexMode: "plugin" | "skill" | undefined;
   let scope: "user" | "repo" | undefined;
+  let globalInstall: boolean | undefined;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--claude") claude = true;
@@ -186,9 +189,11 @@ function parseSetupArgs(argv: string[]): {
     else if (a === "--plugin") codexMode = "plugin";
     else if (a === "--repo") scope = "repo";
     else if (a === "--user") scope = "user";
+    else if (a === "--install") globalInstall = true;
+    else if (a === "--no-install") globalInstall = false;
     else throw new Error(`unknown flag: ${a}`);
   }
-  return { claude, codex, codexMode, scope };
+  return { claude, codex, codexMode, scope, globalInstall };
 }
 
 function parseFlagArray(argv: string[], flag: string): string[] {
