@@ -151,7 +151,6 @@ export function injectSvgRuntime(svgEl: SVGSVGElement) {
  * size changes from JS (chart libraries, dynamic content, etc.).
  */
 const IFRAME_RUNTIME_SCRIPT = `
-  window.sendPrompt = (t) => parent.postMessage({type:"sendPrompt",text:t}, "*");
   window.openLink = (u) => parent.postMessage({type:"openLink",url:u}, "*");
   (function() {
     var lastH = -1;
