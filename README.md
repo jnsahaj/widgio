@@ -5,6 +5,7 @@ Stream animated SVG / HTML widgets from coding agents to a live browser companio
 Works with **Claude Code**, **Codex**, and any agent that can run shell commands.
 
 https://github.com/user-attachments/assets/dea1e995-84a8-4a89-8854-af228d6933d0
+
 Inspired by [Claude's Interactive Diagram Tools](https://claude.com/resources/use-cases/build-interactive-diagram-tools)
 
 ---
